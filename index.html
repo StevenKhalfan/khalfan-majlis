@@ -109,6 +109,14 @@
   .note,.empty{font-size:13px;opacity:.65;margin:6px 2px} .rnote{font-size:11px;opacity:.55;margin:6px 0 0;text-align:center}
   #ropen{position:fixed;z-index:6;bottom:calc(env(safe-area-inset-bottom) + 16px);left:50%;transform:translateX(-50%);display:none;min-height:50px;padding:0 22px;border:none;border-radius:25px;background:#E3A23B;color:#2a1f16;font:700 15px 'IBM Plex Sans Arabic';box-shadow:0 6px 18px rgba(0,0,0,.4);cursor:pointer}
   #ropen.show{display:block}
+  .login{padding:10px 4px} .login h3{margin:6px 0} .login p{font-size:14px;opacity:.8}
+  #remail{width:100%;min-height:48px;border:1.5px solid #e2d3b8;border-radius:14px;padding:10px 12px;font:16px 'IBM Plex Sans Arabic';margin:8px 0 10px;direction:ltr;text-align:left}
+  .login .rbtn{width:100%} .ok{color:#2e7d4a;font-weight:600}
+  .run{min-height:32px;border:none;border-radius:10px;background:#2a1f16;color:#fff;font:700 12px 'IBM Plex Sans Arabic';padding:0 10px;cursor:pointer}
+  .run:disabled,.rbtn:disabled{opacity:.45}
+  .tnote{width:100%;min-height:34px;border:1px dashed #e2d3b8;border-radius:10px;padding:4px 10px;font:13px 'IBM Plex Sans Arabic';background:#fffdf8}
+  .res{width:100%;background:#fbf6ec;border-radius:10px;padding:6px 10px;font-size:13px;line-height:1.7} .res summary{font-weight:700;cursor:pointer;color:#2e7d4a}
+  .msg.busy{opacity:.75;font-style:italic}
   .hint{position:fixed;z-index:4;bottom:calc(env(safe-area-inset-bottom) + 76px);left:50%;transform:translateX(-50%);
     background:rgba(27,19,13,.75);color:var(--sand);padding:8px 14px;border-radius:16px;font-size:13px;white-space:nowrap;transition:opacity .6s}
   #loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:#1b130d;color:var(--sand);font-size:18px;transition:opacity .6s}
@@ -128,7 +136,7 @@
 <div id="scene"></div>
 <div id="labels"></div>
 <div class="bar">
-  <div class="brand">مجلس خلفان <small>المرحلة ١ • v4</small></div>
+  <div class="brand">مجلس خلفان <small>المرحلة ١ • v5</small></div>
   <button class="btn on" id="bMajlis">المجلس</button>
   <button class="btn" id="bCoffee">قهوة المغرب</button>
   <button class="btn" id="bTop">منظر علوي</button>
@@ -609,8 +617,10 @@ const rLight=new THREE.PointLight(0xffd29a,22,18,1.5); at(rLight,0,4.5,1); rozna
 const roznaSteven=makeCharacter('steven'); roznaSteven.position.set(0,0,-3.2); rozna.add(roznaSteven);
 const roznaChars=[roznaSteven];
 
-/* ---------- بيانات الروزنة (محفوظة على هذا الجهاز) ---------- */
-const RKEY='khalfan_rozna_v1';
+/* ---------- بيانات الروزنة (سحابية ومتزامنة) ---------- */
+const SB_URL='https://upmvonycmyqnuaswjojs.supabase.co', SB_KEY='sb_publishable_WMD5nDJ01on5Cz19TnRLTg_XF1fdqAN';
+const sbReady=import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(m=>m.createClient(SB_URL,SB_KEY)).catch(()=>null);
+let sb=null, session=null, allowed=null, busy='';
 const MEMBERS=['michael','jennifer','christina','matthew'];
 const SEED={
   projects:[
@@ -626,29 +636,26 @@ const SEED={
     {id:'thor',name:'Thor',owners:'مايكل',status:'blue'},
   ],
   tasks:[
-    {id:1,member:'michael',text:'المرحلة 1 من مجلس خلفان',project:'majlis',status:'done'},
-    {id:2,member:'michael',text:'خانة الأوامر لكل عضو في المجلس',project:'majlis',status:'done'},
-    {id:3,member:'michael',text:'بناء الروزنة (مكتب المدير العام)',project:'majlis',status:'doing'},
-    {id:4,member:'michael',text:'رأي المجلس في الأسئلة السبعة للأكاديمية',project:'acad',status:'done'},
-    {id:5,member:'christina',text:'اعتماد شكل الشخصيات والمجلس وقهوة المغرب',project:'majlis',status:'done'},
-    {id:6,member:'jennifer',text:'خطة محتوى شهرية لـ محل و AI Minute',project:'aim',status:'new'},
-    {id:7,member:'matthew',text:'استلام جدول الدوام والدراسة والاشتراكات من ستيفن',project:'study',status:'new'},
+    {member:'michael',text:'المرحلة 1 من مجلس خلفان',project:'majlis',status:'done'},
+    {member:'michael',text:'خانة الأوامر لكل عضو في المجلس',project:'majlis',status:'done'},
+    {member:'michael',text:'رأي المجلس في الأسئلة السبعة للأكاديمية',project:'acad',status:'done'},
+    {member:'michael',text:'الروزنة الذكية: الدخول والمزامنة وذكاء ستيفن',project:'majlis',status:'doing'},
+    {member:'christina',text:'اعتماد شكل الشخصيات والمجلس وقهوة المغرب',project:'majlis',status:'done'},
+    {member:'jennifer',text:'خطة محتوى شهرية لـ محل و AI Minute',project:'aim',status:'new'},
+    {member:'matthew',text:'استلام جدول الدوام والدراسة والاشتراكات من ستيفن',project:'study',status:'new'},
   ],
-  log:[], lastCheckin:'', nextId:8,
 };
-let RS; try{ RS=JSON.parse(localStorage.getItem(RKEY)||'null'); }catch{ RS=null; }
-if(!RS||!RS.projects) RS=JSON.parse(JSON.stringify(SEED));
-const saveRS=()=>{ try{ localStorage.setItem(RKEY,JSON.stringify(RS)); }catch{} drawBoards(); };
+let RS={projects:SEED.projects, tasks:[], log:[], lastCheckin:''};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); };
+const todayISO=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Muscat'});
 const ST_LABEL={new:'جديد',doing:'شغّال',done:'خلص'}, ST_NEXT={new:'doing',doing:'done',done:'new'};
 const P_COL={green:'#3cb371',yellow:'#e0b13b',red:'#d9534f',blue:'#7aa6d6'}, P_LBL={green:'على المسار',yellow:'يحتاج دفعة',red:'متعثر',blue:'فكرة'}, P_NEXT={green:'yellow',yellow:'red',red:'blue',blue:'green'};
 const ROLE_WORD={michael:'تقنية',jennifer:'تسويق',christina:'تصميم',matthew:'مكتب ومالية'};
 const KW={
   christina:['تصميم','صمم','صمّم','صممي','صمّمي','بوست','ستوري','شعار','لوقو','لوجو','هوية','مونتاج','فيديو','ريل','ريلز','صورة','صور','كاركتر','شخصية','غلاف','ثمبنيل','بوستر','فلاير','كانفا','canva','design'],
-  jennifer:['تسويق','اعلان','إعلان','اعلانات','إعلانات','حملة','كابشن','محتوى','متابعين','انستغرام','إنستغرام','انستقرام','تيك توك','تيكتوك','سناب','جمهور','مؤثر','هاشتاق','خطة نشر','تفاعل','وصول','دخل الحساب','monetization','marketing'],
-  michael:['كود','برمجة','برمج','موقع','تطبيق','تقني','تقنية','رادار','أداة','اداة','أدوات','ادوات','سكيل','skill','connector','كونكتر','github','قيت هب','خادم','سيرفر','api','supabase','vercel','أتمتة','اتمتة','الذكاء الاصطناعي الجديد','أخبار الذكاء','اخبار الذكاء','دومين','نطاق','استضافة','بوت','agent','وكيل'],
-  matthew:['ايميل','إيميل','ايميلات','إيميلات','بريد','جدول','جدولي','وقت','موعد','مواعيد','اجتماع','دراسة','محاضرة','اختبار','امتحان','واجب','تسليم','مالية','فلوس','اشتراك','اشتراكات','فاتورة','فواتير','ميزانية','دخل','مصروف','مصاريف','حسابات','قانوني','محامي','تسجيل تجاري','سجل تجاري'],
+  jennifer:['تسويق','اعلان','إعلان','اعلانات','إعلانات','حملة','كابشن','محتوى','متابعين','انستغرام','إنستغرام','انستقرام','تيك توك','تيكتوك','سناب','جمهور','مؤثر','هاشتاق','خطة نشر','تفاعل','وصول','marketing'],
+  michael:['كود','برمجة','برمج','موقع','تطبيق','تقني','تقنية','رادار','أداة','اداة','أدوات','ادوات','سكيل','skill','connector','كونكتر','github','خادم','سيرفر','api','supabase','vercel','أتمتة','اتمتة','أخبار الذكاء','اخبار الذكاء','دومين','نطاق','استضافة','بوت','agent','وكيل'],
+  matthew:['ايميل','إيميل','ايميلات','إيميلات','بريد','جدول','جدولي','وقت','موعد','مواعيد','اجتماع','دراسة','محاضرة','اختبار','امتحان','واجب','تسليم','مالية','فلوس','اشتراك','اشتراكات','فاتورة','فواتير','ميزانية','دخل','مصروف','مصاريف','حسابات','قانوني','محامي','سجل تجاري'],
 };
 const PROJ_KW={mahal:['محل','mahal','موردين','مورد'],aim:['ai minute','دقيقة ذكاء','aiminute'],acad:['أكاديمية','اكاديمية','الأكاديمية','تداول','المحاكي','طلاب'],majlis:['المجلس','مجلس خلفان','الروزنة'],office:['مكتب ستيفن'],brand:['stevenkhalfan','حسابي الشخصي'],study:['ماجستير','cips','دراسة','محاضرة','اختبار'],px:['project x','مقاولات'],eo:['explore oman','سياحة'],thor:['thor','ثور']};
 function routeTask(text){ const t=text.toLowerCase(); let best=null,score=0;
@@ -656,52 +663,89 @@ function routeTask(text){ const t=text.toLowerCase(); let best=null,score=0;
 function projectOf(text){ const t=text.toLowerCase(); for(const [p,ks] of Object.entries(PROJ_KW)) if(ks.some(k=>t.includes(k.toLowerCase()))) return p; return null; }
 const pName=id=>(RS.projects.find(p=>p.id===id)||{}).name||'';
 const first=id=>BY[id].name.split(' ')[0];
-function stevenSay(text,extra={}){ RS.log.push({from:'steven',text,t:Date.now(),...extra}); RS.log=RS.log.slice(-40); }
+const splitLines=raw=>raw.split(/\n|؛|•/).map(s=>s.trim()).filter(s=>s.length>1);
 
-function distribute(raw,forced){
-  const lines=raw.split(/\n|؛|•|\s-\s/).map(s=>s.trim()).filter(s=>s.length>1);
-  if(!lines.length) return;
-  RS.log.push({from:'me',text:raw.trim(),t:Date.now()});
-  const done=[], pending=[];
-  for(const line of lines){ const m=forced&&forced!=='auto'?forced:routeTask(line); const task={id:RS.nextId++,member:m,text:line,project:projectOf(line),status:'new'};
-    RS.tasks.push(task); (m?done:pending).push(task); }
-  let msg = done.length ? `تمام يا ستيفن ✓ وزّعت ${done.length===1?'المهمة':done.length+' مهام'}:\n`+done.map(t=>`• ${BY[t.member].emoji} ${first(t.member)} ← «${t.text}»${forced&&forced!=='auto'?'':' ('+ROLE_WORD[t.member]+')'}${t.project?' — '+pName(t.project):''}`).join('\n') : '';
-  if(pending.length) msg += (msg?'\n\n':'')+`ما عرفت لمين ${pending.length===1?'هذي':'هذول'}، حددها لي تحت في «الفريق»:\n`+pending.map(t=>`• ❔ «${t.text}»`).join('\n');
-  stevenSay(msg); saveRS(); renderRozna();
+async function cloudLoad(){
+  const [p,t,m,me]=await Promise.all([
+    sb.from('projects').select('*').order('sort'),
+    sb.from('tasks').select('*').order('created_at'),
+    sb.from('messages').select('*').order('created_at',{ascending:false}).limit(60),
+    sb.from('meta').select('*').maybeSingle()]);
+  if(p.error) throw p.error;
+  if(!p.data.length){
+    await sb.from('projects').insert(SEED.projects.map((x,i)=>({...x,sort:i})));
+    await sb.from('tasks').insert(SEED.tasks);
+    return cloudLoad();
+  }
+  RS.projects=p.data; RS.tasks=t.data||[];
+  RS.log=(m.data||[]).reverse().map(x=>({from:x.sender,text:x.body,kind:x.kind}));
+  RS.lastCheckin=me.data?.last_checkin||'';
+  drawBoards();
 }
-function memberLines(m){ const ts=RS.tasks.filter(t=>t.member===m);
-  const pick=s=>ts.filter(t=>t.status===s).map(t=>t.text);
-  return {done:pick('done'),doing:pick('doing'),next:pick('new')}; }
-const DEFAULT_PLAN={
-  michael:'الرادار اليومي لأخبار الذكاء الاصطناعي، وتقرير الأدوات الجديدة كل أحد، ومتابعة مهام الفريق.',
-  jennifer:'تجهيز تقويم النشر وتحليل أداء الحسابات من بيانات حقيقية.',
-  christina:'مراجعة كل تصميم قبل النشر والحفاظ على الهويات.',
-  matthew:'ترتيب جدولك الأسبوعي وموجز البريد ومتابعة الاشتراكات.',
-};
-function summary(){
-  const n=s=>RS.tasks.filter(t=>t.status===s).length;
-  const d=new Date().toLocaleDateString('ar-OM',{weekday:'long',day:'numeric',month:'long'});
-  let out=`📋 الملخص العام — ${d}\nالمهام: ✅ ${n('done')} خلصت • ⏳ ${n('doing')} شغّالة • 📌 ${n('new')} جديدة\n`;
-  for(const m of MEMBERS){ const L=memberLines(m), t=BY[m], f=(m==='jennifer'||m==='christina');
-    const v=(a,b)=>f?b:a;
-    out+=`\n${t.emoji} ${t.name} — ${t.role}\n`;
-    out+=`✅ ${v('خلّص','خلّصت')}: ${L.done.length?L.done.slice(-3).join('، '):'—'}\n`;
-    out+=`⏳ ${v('شغّال','شغّالة')} على: ${L.doing.length?L.doing.join('، '):'—'}\n`;
-    out+=`📌 الجاي: ${L.next.length?L.next.join('، '):'—'}\n`;
-    const plan = L.doing.length&&L.next.length ? `${v('يخلّص','تخلّص')} «${L.doing[0]}» وبعدها ${v('يبدأ','تبدأ')} «${L.next[0]}».` : L.next.length ? `${v('يبدأ','تبدأ')} بـ «${L.next[0]}».` : L.doing.length ? `${v('يركّز','تركّز')} على «${L.doing[0]}» لين ${v('يخلص','تخلص')}.` : DEFAULT_PLAN[m];
-    out+=`🧭 ${v('خطته','خطتها')}: ${plan}\n`; }
-  const unassigned=RS.tasks.filter(t=>!t.member&&t.status!=='done');
-  if(unassigned.length) out+=`\n❔ بدون مسؤول: ${unassigned.map(t=>t.text).join('، ')}\n`;
-  const watch=RS.projects.filter(p=>p.status==='yellow'||p.status==='red');
-  if(watch.length) out+=`\n⚠️ مشاريع تحتاج انتباهك: ${watch.map(p=>p.name+' ('+P_LBL[p.status]+')').join('، ')}`;
-  return out.trim();
-}
-function dailyCheckin(){
-  if(RS.lastCheckin===today()) return;
-  RS.lastCheckin=today(); const h=new Date().getHours();
+async function say(sender,body,kind='chat'){ await sb.from('messages').insert({sender,body,kind}); }
+async function dailyCheckin(){
+  if(RS.lastCheckin===todayISO()) return;
+  const h=+new Date().toLocaleString('en-GB',{timeZone:'Asia/Muscat',hour:'2-digit',hour12:false});
   const open=MEMBERS.map(m=>`${first(m)} (${RS.tasks.filter(t=>t.member===m&&t.status!=='done').length})`).join('، ');
-  stevenSay(`${h<12?'صباح الخير':'مساء الخير'} يا ستيفن ☀️\nوش تبي من الشباب اليوم؟ اكتب الأشغال تحت، كل شغلة في سطر، وأنا أوزّعها على الكل حسب تخصصه.\nالمهام المفتوحة الحين: ${open}.`);
-  saveRS();
+  await say('steven',`${h<12?'صباح الخير':'مساء الخير'} يا ستيفن ☀️\nوش تبي من الشباب اليوم؟ اكتب الأشغال تحت، وأنا أوزّعها على الكل حسب تخصصه.\nالمهام المفتوحة الحين: ${open}.`);
+  await sb.from('meta').upsert({last_checkin:todayISO()});
+  await cloudLoad();
+}
+async function callSteven(body){
+  const {data,error}=await sb.functions.invoke('steven',{body});
+  if(error) return {error:'net'};
+  return data||{error:'net'};
+}
+const ERR={no_key:'⚠️ مفتاح Claude API مو مركّب بعد، فاشتغلت بالطريقة البسيطة.',daily_limit:'⚠️ وصلنا حد الاستخدام اليومي، نكمل بكرة.',net:'⚠️ ما قدرت أوصل لخادم الذكاء الحين.',not_allowed:'⚠️ هذا الحساب غير مصرّح.'};
+async function distribute(raw,forced){
+  busy='ستيفن يوزّع…'; renderRozna();
+  try{
+    if(forced!=='auto'){
+      const lines=splitLines(raw);
+      await sb.from('tasks').insert(lines.map(l=>({member:forced,text:l,project:projectOf(l)})));
+      await say('me',raw.trim());
+      await say('steven',`تمام ✓ عطيت ${first(forced)} ${lines.length===1?'المهمة':lines.length+' مهام'}:\n`+lines.map(l=>`• «${l}»`).join('\n'));
+    } else {
+      const r=await callSteven({action:'distribute',text:raw});
+      if(r.error){
+        const lines=splitLines(raw), rows=lines.map(l=>({member:routeTask(l),text:l,project:projectOf(l)}));
+        await sb.from('tasks').insert(rows);
+        await say('me',raw.trim());
+        const ok=rows.filter(x=>x.member), no=rows.filter(x=>!x.member);
+        let msg=(ERR[r.error]||('⚠️ '+r.error))+'\n';
+        if(ok.length) msg+=`وزّعت ${ok.length}:\n`+ok.map(x=>`• ${BY[x.member].emoji} ${first(x.member)} ← «${x.text}» (${ROLE_WORD[x.member]})`).join('\n');
+        if(no.length) msg+=`\nما عرفت لمين، حددها في «الفريق»:\n`+no.map(x=>`• ❔ «${x.text}»`).join('\n');
+        await say('steven',msg);
+      }
+    }
+  }catch(e){ await say('steven','⚠️ صار خطأ: '+(e.message||e)); }
+  busy=''; await cloudLoad(); renderRozna();
+}
+async function runSummary(){
+  busy='ستيفن يجمع الملخص…'; renderRozna();
+  const r=await callSteven({action:'summary'});
+  if(r.error) await say('steven',(ERR[r.error]||'')+'\n\n'+localSummary(),'summary');
+  busy=''; await cloudLoad(); renderRozna();
+}
+async function execute(id){
+  const t=RS.tasks.find(x=>x.id===id); if(!t) return;
+  busy=`${first(t.member)} ${t.member==='jennifer'||t.member==='christina'?'تشتغل':'يشتغل'} على «${t.text.slice(0,40)}»…`; t.status='doing'; renderRozna();
+  const note=(document.getElementById('note_'+id)||{}).value||'';
+  const r=await callSteven({action:'execute',id,note});
+  if(r.error) await say('steven',r.error==='no_key'?'⚠️ التنفيذ يحتاج مفتاح Claude API. ركّبه في Supabase وجرّب مرة ثانية.':(ERR[r.error]||'⚠️ '+r.error));
+  busy=''; await cloudLoad(); renderRozna();
+}
+function memberLines(m){ const ts=RS.tasks.filter(t=>t.member===m); const pick=s=>ts.filter(t=>t.status===s).map(t=>t.text); return {done:pick('done'),doing:pick('doing'),next:pick('new')}; }
+const DEFAULT_PLAN={michael:'الرادار اليومي، وتقرير الأدوات كل أحد، ومتابعة مهام الفريق.',jennifer:'تقويم النشر وتحليل أداء الحسابات.',christina:'مراجعة التصاميم قبل النشر وحماية الهويات.',matthew:'ترتيب جدولك وموجز البريد والاشتراكات.'};
+function localSummary(){
+  const n=s=>RS.tasks.filter(t=>t.status===s).length;
+  let out=`📋 الملخص العام — ${new Date().toLocaleDateString('ar-OM',{weekday:'long',day:'numeric',month:'long'})}\nالمهام: ✅ ${n('done')} • ⏳ ${n('doing')} • 📌 ${n('new')}\n`;
+  for(const m of MEMBERS){ const L=memberLines(m), t=BY[m], f=(m==='jennifer'||m==='christina'), v=(a,b)=>f?b:a;
+    out+=`\n${t.emoji} ${t.name}\n✅ ${v('خلّص','خلّصت')}: ${L.done.slice(-3).join('، ')||'—'}\n⏳ ${v('شغّال','شغّالة')} على: ${L.doing.join('، ')||'—'}\n📌 الجاي: ${L.next.join('، ')||'—'}\n`;
+    out+=`🧭 ${v('خطته','خطتها')}: ${L.next[0]?`«${L.next[0]}»`:L.doing[0]?`يكمّل «${L.doing[0]}»`:DEFAULT_PLAN[m]}\n`; }
+  const watch=RS.projects.filter(p=>p.status==='yellow'||p.status==='red');
+  if(watch.length) out+=`\n⚠️ تحتاج انتباه: ${watch.map(p=>p.name).join('، ')}`;
+  return out.trim();
 }
 
 /* ---------- لوحات الجدران ---------- */
@@ -712,12 +756,11 @@ const teamT=new THREE.CanvasTexture(teamCanvas); teamT.colorSpace=THREE.SRGBColo
 function drawBoards(){
   let g=boardCanvas.getContext('2d'), w=1024, h=640;
   g.fillStyle='#14202c'; g.fillRect(0,0,w,h); g.fillStyle='#E3A23B'; g.font='700 50px "IBM Plex Sans Arabic"'; g.textAlign='right'; g.direction='rtl'; g.fillText('لوحة المشاريع',w-36,66);
-  g.font='600 32px "IBM Plex Sans Arabic"';
   RS.projects.forEach((p,i)=>{ const col=i<5?0:1, row=i%5, x=w-36-col*490, y=135+row*98;
     g.fillStyle=P_COL[p.status]; g.beginPath(); g.arc(x-14,y-11,13,0,7); g.fill();
-    g.fillStyle='#f3ead8'; g.fillText(p.name,x-40,y);
+    g.fillStyle='#f3ead8'; g.font='600 32px "IBM Plex Sans Arabic"'; g.fillText(p.name,x-40,y);
     const open=RS.tasks.filter(t=>t.project===p.id&&t.status!=='done').length;
-    g.fillStyle='rgba(243,234,216,.6)'; g.font='400 24px "IBM Plex Sans Arabic"'; g.fillText(`${P_LBL[p.status]} • ${open} مفتوحة`,x-40,y+34); g.font='600 32px "IBM Plex Sans Arabic"'; });
+    g.fillStyle='rgba(243,234,216,.6)'; g.font='400 24px "IBM Plex Sans Arabic"'; g.fillText(`${P_LBL[p.status]} • ${open} مفتوحة`,x-40,y+34); });
   boardT.needsUpdate=true;
   g=teamCanvas.getContext('2d');
   g.fillStyle='#fbf6ec'; g.fillRect(0,0,w,h); g.fillStyle='#5a3820'; g.font='700 50px "IBM Plex Sans Arabic"'; g.textAlign='right'; g.direction='rtl'; g.fillText('الفريق اليوم',w-36,66);
@@ -736,44 +779,79 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(drawBoards);
 
 /* ---------- واجهة الروزنة ---------- */
 const rp=document.getElementById('rpanel'), rOpen=document.getElementById('ropen');
-let rTab='orders', rForced='auto';
+let rTab='orders', rForced='auto', loginSent='';
+const who=from=> from==='steven'?'⭐ ستيفن':BY[from]?`${BY[from].emoji} ${BY[from].name}`:'';
+function headHTML(){ return `<div class="rhead"><div class="avatar" style="--c:#E3A23B">س</div><div><h2>روزنة المدير العام</h2><p>${session?esc(session.user.email):'ستيفن يوزّع الشغل ويعطيك الملخص'}</p></div>${session?'<button class="mini" id="rout">خروج</button>':''}<button class="close" id="rclose" aria-label="تصغير">−</button></div>`; }
 function renderRozna(){
+  if(!sb){ rp.innerHTML=headHTML()+'<p class="empty">ما قدرت أحمّل خدمة المزامنة. تأكد من الإنترنت وحدّث الصفحة.</p>'; bindHead(); return; }
+  if(!session){
+    rp.innerHTML=headHTML()+`<div class="rbody"><div class="login"><h3>ادخل الروزنة</h3><p>اكتب إيميلك، ويوصلك رابط دخول. بدون كلمة سر.</p>
+      <input id="remail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" value="${esc(loginSent)}">
+      <button class="rbtn main" id="rlogin">أرسل رابط الدخول</button>${loginSent?`<p class="ok">✓ أرسلت الرابط إلى ${esc(loginSent)}. افتح الإيميل من نفس الجهاز واضغط الرابط.</p>`:''}</div></div>`;
+    bindHead();
+    rp.querySelector('#rlogin').onclick=async()=>{ const e=rp.querySelector('#remail').value.trim(); if(!e) return;
+      const {error}=await sb.auth.signInWithOtp({email:e,options:{emailRedirectTo:location.origin+location.pathname}});
+      if(error){ alertMsg(error.message); return; } loginSent=e; renderRozna(); };
+    return;
+  }
+  if(allowed===false){ rp.innerHTML=headHTML()+'<p class="empty">هذا الإيميل غير مصرّح له بدخول الروزنة.</p>'; bindHead(); return; }
   const tabs=[['orders','الأوامر'],['team','الفريق'],['projects','المشاريع']];
   let body='';
   if(rTab==='orders'){
-    body=`<div class="rlog" id="rlog">${RS.log.map((l,i)=>`<div class="msg ${l.from}">${l.from==='steven'?'<b>⭐ ستيفن</b>':''}<div>${esc(l.text).replace(/\n/g,'<br>')}</div>${l.from==='steven'&&l.copy?`<button class="mini" data-copy="${i}">نسخ</button>`:''}</div>`).join('')||'<p class="empty">اكتب أوامرك تحت، وستيفن يوزّعها على الفريق.</p>'}</div>
+    body=`<div class="rlog" id="rlog">${RS.log.map((l,i)=>`<div class="msg ${l.from==='me'?'me':'steven'}">${l.from!=='me'?`<b>${who(l.from)}</b>`:''}<div>${esc(l.text).replace(/\n/g,'<br>')}</div>${l.kind&&l.kind!=='chat'?`<button class="mini" data-copy="${i}">نسخ</button>`:''}</div>`).join('')||'<p class="empty">اكتب أوامرك تحت، وستيفن يوزّعها على الفريق.</p>'}${busy?`<div class="msg steven busy"><b>⏳</b>${esc(busy)}</div>`:''}</div>
     <div class="rcomp">
       <div class="who">${[['auto','⭐ ستيفن يوزّع'],...MEMBERS.map(m=>[m,BY[m].emoji+' '+first(m)])].map(([k,l])=>`<button class="pick ${rForced===k?'on':''}" data-pick="${k}">${l}</button>`).join('')}</div>
-      <textarea id="rtext" rows="3" placeholder="اكتب الأشغال، كل شغلة في سطر…"></textarea>
-      <div class="ract"><button class="rbtn main" id="rsend">وزّع ←</button><button class="rbtn" id="rsum">📋 ملخص عام</button></div>
+      <textarea id="rtext" rows="3" placeholder="اكتب الأوامر… ستيفن يفهمها ويوزّعها"></textarea>
+      <div class="ract"><button class="rbtn main" id="rsend" ${busy?'disabled':''}>وزّع ←</button><button class="rbtn" id="rsum" ${busy?'disabled':''}>📋 ملخص عام</button></div>
     </div>`;
   } else if(rTab==='team'){
-    const groups=[...MEMBERS,null];
-    body=groups.map(m=>{ const ts=RS.tasks.filter(t=>t.member===m); if(m===null&&!ts.length) return '';
+    body=(busy?`<p class="note">⏳ ${esc(busy)}</p>`:'')+[...MEMBERS,null].map(m=>{ const ts=RS.tasks.filter(t=>t.member===m); if(m===null&&!ts.length) return '';
       const t=m?BY[m]:{name:'بدون مسؤول',role:'حدّد لمين',color:'#999',emoji:'❔'};
       return `<div class="mcard" style="--c:${t.color}"><div class="mh"><b>${t.emoji} ${t.name}</b><span>${t.role}</span></div>
-        ${ts.length?ts.slice().reverse().map(x=>`<div class="task ${x.status}"><button class="st" data-st="${x.id}">${ST_LABEL[x.status]}</button><span class="tx">${esc(x.text)}${x.project?` <i>${esc(pName(x.project))}</i>`:''}</span>${m===null?`<span class="as">${MEMBERS.map(mm=>`<button data-as="${x.id}:${mm}">${first(mm)}</button>`).join('')}</span>`:''}<button class="del" data-del="${x.id}" aria-label="حذف">×</button></div>`).join(''):'<p class="empty">ما عنده مهام حاليًا.</p>'}</div>`; }).join('');
+        ${ts.length?ts.slice().reverse().map(x=>`<div class="task ${x.status}"><button class="st" data-st="${x.id}">${ST_LABEL[x.status]}</button><span class="tx">${esc(x.text)}${x.project?` <i>${esc(pName(x.project))}</i>`:''}</span>
+          ${m&&x.status!=='done'?`<button class="run" data-run="${x.id}" ${busy?'disabled':''}>▶ نفّذ</button>`:''}
+          ${m===null?`<span class="as">${MEMBERS.map(mm=>`<button data-as="${x.id}:${mm}">${first(mm)}</button>`).join('')}</span>`:''}<button class="del" data-del="${x.id}" aria-label="حذف">×</button>
+          ${m&&x.status!=='done'?`<input class="tnote" id="note_${x.id}" placeholder="ملاحظة للتنفيذ (اختياري)">`:''}
+          ${x.result?`<details class="res"><summary>النتيجة</summary><div>${esc(x.result).replace(/\n/g,'<br>')}</div><button class="mini" data-cres="${x.id}">نسخ</button></details>`:''}</div>`).join(''):'<p class="empty">ما عنده مهام حاليًا.</p>'}</div>`; }).join('');
   } else {
     body=`<p class="note">اضغط على الدائرة عشان تغيّر حالة المشروع.</p>`+RS.projects.map(p=>{ const open=RS.tasks.filter(t=>t.project===p.id&&t.status!=='done').length;
       return `<div class="prow"><button class="pdot" style="background:${P_COL[p.status]}" data-ps="${p.id}" aria-label="غيّر الحالة"></button><div><b>${esc(p.name)}</b><span>${P_LBL[p.status]} • ${esc(p.owners)} • ${open} مهام مفتوحة</span></div></div>`; }).join('');
   }
-  rp.innerHTML=`<div class="rhead"><div class="avatar" style="--c:#E3A23B">س</div><div><h2>روزنة المدير العام</h2><p>ستيفن يوزّع الشغل ويعطيك الملخص</p></div><button class="close" id="rclose" aria-label="تصغير">−</button></div>
-    <div class="rtabs">${tabs.map(([k,l])=>`<button class="${rTab===k?'on':''}" data-tab="${k}">${l}</button>`).join('')}</div>
-    <div class="rbody">${body}</div><p class="rnote">💾 محفوظ على هذا الجهاز فقط.</p>`;
+  rp.innerHTML=headHTML()+`<div class="rtabs">${tabs.map(([k,l])=>`<button class="${rTab===k?'on':''}" data-tab="${k}">${l}</button>`).join('')}</div><div class="rbody">${body}</div><p class="rnote">☁️ متزامن بين أجهزتك.</p>`;
+  bindHead();
   rp.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ rTab=b.dataset.tab; renderRozna(); });
-  rp.querySelector('#rclose').onclick=()=>{ rp.classList.remove('open'); rOpen.classList.add('show'); };
   rp.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{ rForced=b.dataset.pick; const v=rp.querySelector('#rtext').value; renderRozna(); const ta=rp.querySelector('#rtext'); ta.value=v; ta.focus(); });
   const send=rp.querySelector('#rsend'); if(send) send.onclick=()=>{ const v=rp.querySelector('#rtext').value; if(!v.trim()){ rp.querySelector('#rtext').focus(); return; } distribute(v,rForced); };
-  const sum=rp.querySelector('#rsum'); if(sum) sum.onclick=()=>{ stevenSay(summary(),{copy:true}); saveRS(); renderRozna(); };
-  rp.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(RS.log[+b.dataset.copy].text); b.textContent='✓ انتسخ'; }catch{ b.textContent='ما قدرت أنسخ'; } });
-  rp.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ const t=RS.tasks.find(x=>x.id==b.dataset.st); t.status=ST_NEXT[t.status]; saveRS(); renderRozna(); });
-  rp.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ RS.tasks=RS.tasks.filter(x=>x.id!=b.dataset.del); saveRS(); renderRozna(); });
-  rp.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>{ const [id,m]=b.dataset.as.split(':'); const t=RS.tasks.find(x=>x.id==id); t.member=m; stevenSay(`تمام، «${t.text}» صارت عند ${first(m)}.`); saveRS(); renderRozna(); });
-  rp.querySelectorAll('[data-ps]').forEach(b=>b.onclick=()=>{ const p=RS.projects.find(x=>x.id===b.dataset.ps); p.status=P_NEXT[p.status]; saveRS(); renderRozna(); });
+  const sum=rp.querySelector('#rsum'); if(sum) sum.onclick=runSummary;
+  rp.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copyText(RS.log[+b.dataset.copy].text,b));
+  rp.querySelectorAll('[data-cres]').forEach(b=>b.onclick=()=>copyText(RS.tasks.find(x=>x.id==b.dataset.cres).result,b));
+  rp.querySelectorAll('[data-run]').forEach(b=>b.onclick=()=>execute(+b.dataset.run));
+  rp.querySelectorAll('[data-st]').forEach(b=>b.onclick=async()=>{ const t=RS.tasks.find(x=>x.id==b.dataset.st); t.status=ST_NEXT[t.status]; renderRozna(); await sb.from('tasks').update({status:t.status,updated_at:new Date().toISOString()}).eq('id',t.id); await cloudLoad(); });
+  rp.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{ RS.tasks=RS.tasks.filter(x=>x.id!=b.dataset.del); renderRozna(); await sb.from('tasks').delete().eq('id',+b.dataset.del); await cloudLoad(); });
+  rp.querySelectorAll('[data-as]').forEach(b=>b.onclick=async()=>{ const [id,m]=b.dataset.as.split(':'); const t=RS.tasks.find(x=>x.id==id); await sb.from('tasks').update({member:m}).eq('id',+id); await say('steven',`تمام، «${t.text}» صارت عند ${first(m)}.`); await cloudLoad(); renderRozna(); });
+  rp.querySelectorAll('[data-ps]').forEach(b=>b.onclick=async()=>{ const p=RS.projects.find(x=>x.id===b.dataset.ps); p.status=P_NEXT[p.status]; renderRozna(); drawBoards(); await sb.from('projects').update({status:p.status}).eq('id',p.id); });
   const log=rp.querySelector('#rlog'); if(log) log.scrollTop=log.scrollHeight;
 }
-function openRozna(){ dailyCheckin(); renderRozna(); rp.classList.add('open'); rOpen.classList.remove('show'); }
+function bindHead(){ const c=rp.querySelector('#rclose'); if(c) c.onclick=()=>{ rp.classList.remove('open'); rOpen.classList.add('show'); };
+  const o=rp.querySelector('#rout'); if(o) o.onclick=async()=>{ await sb.auth.signOut(); session=null; allowed=null; renderRozna(); }; }
+async function copyText(t,b){ try{ await navigator.clipboard.writeText(t); b.textContent='✓ انتسخ'; }catch{ b.textContent='ما قدرت أنسخ'; } }
+function alertMsg(m){ const p=document.createElement('p'); p.className='empty'; p.textContent='⚠️ '+m; rp.querySelector('.rbody')?.appendChild(p); }
+async function afterAuth(){
+  if(!session){ allowed=null; renderRozna(); return; }
+  const {data}=await sb.rpc('is_allowed'); allowed=!!data;
+  if(allowed){ try{ await cloudLoad(); await dailyCheckin(); }catch(e){ console.error(e); } }
+  renderRozna();
+}
+sbReady.then(async c=>{ sb=c; if(!sb) return;
+  const {data}=await sb.auth.getSession(); session=data.session;
+  sb.auth.onAuthStateChange((_e,s)=>{ const changed=(s?.user?.id)!==(session?.user?.id); session=s; if(changed) afterAuth(); });
+  if(session) afterAuth();
+  if(location.hash.includes('access_token')) history.replaceState(null,'',location.pathname);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&session&&allowed&&!busy) cloudLoad().then(()=>{ if(rp.classList.contains('open')) renderRozna(); }); });
+});
+function openRozna(){ renderRozna(); rp.classList.add('open'); rOpen.classList.remove('show'); if(session&&allowed) cloudLoad().then(dailyCheckin).then(renderRozna).catch(()=>{}); }
 rOpen.onclick=openRozna;
+if(location.hash.includes('access_token')||location.search.includes('code=')) setTimeout(()=>setMode('rozna'),300);
 
 /* ================= الملصقات والتفاعل ================= */
 const labelsEl=document.getElementById('labels'); const tags={};
