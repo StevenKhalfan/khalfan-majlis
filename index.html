@@ -63,6 +63,12 @@
     background:rgba(255,250,240,.95);font:700 13px 'IBM Plex Sans Arabic',sans-serif;color:#2a1f16}
   .mem i{width:32px;height:32px;border-radius:50%;background:var(--c);color:#fff;font-style:normal;display:grid;place-items:center;font-size:15px}
   @media (max-width:600px){ #crew{justify-content:flex-start} }
+  #order{width:100%;margin-top:10px;border:1.5px solid #e2d3b8;border-radius:14px;padding:12px;font:15px 'IBM Plex Sans Arabic',sans-serif;background:#fff;resize:vertical;min-height:96px;color:#2a1f16}
+  #order:focus{outline:none;border-color:var(--saffron)}
+  .quick .chip{border:none;cursor:pointer;font:600 13px 'IBM Plex Sans Arabic',sans-serif;min-height:36px;padding:6px 12px;background:#f3e9d6;color:#2a1f16}
+  .ghost{width:100%;min-height:44px;margin-top:8px;border:1px solid #e2d3b8;border-radius:14px;background:transparent;font:600 14px 'IBM Plex Sans Arabic',sans-serif;cursor:pointer;color:#5a3820}
+  .howto{font-size:12px;opacity:.7;margin:8px 0 0;line-height:1.6}
+  details{margin-top:14px;font-size:14px} details summary{cursor:pointer;font-weight:700;color:var(--date);min-height:32px}
   .hint{position:fixed;z-index:4;bottom:calc(env(safe-area-inset-bottom) + 76px);left:50%;transform:translateX(-50%);
     background:rgba(27,19,13,.75);color:var(--sand);padding:8px 14px;border-radius:16px;font-size:13px;white-space:nowrap;transition:opacity .6s}
   #loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:#1b130d;color:var(--sand);font-size:18px;transition:opacity .6s}
@@ -82,7 +88,7 @@
 <div id="scene"></div>
 <div id="labels"></div>
 <div class="bar">
-  <div class="brand">مجلس خلفان <small>المرحلة ١ • v3.2</small></div>
+  <div class="brand">مجلس خلفان <small>المرحلة ١ • v3.3</small></div>
   <button class="btn on" id="bMajlis">المجلس</button>
   <button class="btn" id="bCoffee">قهوة المغرب</button>
   <button class="btn" id="bTop">منظر علوي</button>
@@ -539,13 +545,42 @@ TEAM.forEach(t=>{ mkTag(t,'m_'+t.id); mkTag(t,'c_'+t.id); });
 const crew=document.getElementById('crew');
 TEAM.forEach(t=>{ const b=document.createElement('button'); b.className='mem'; b.style.setProperty('--c',t.color); b.innerHTML=`<i>${t.name[0]}</i>${t.name.split(' ')[0]}`; b.onclick=()=>openSheet(t.id); crew.appendChild(b); });
 const sheet=document.getElementById('sheet');
-function openSheet(id){ const t=BY[id]; const prompt=id==='steven'?'قهوة المغرب: وين وصلنا؟':`${t.name.split(' ')[0]}: `;
+const PROJECT_URL='https://claude.ai/project/01a1f36a-a5f0-7218-83ae-684fe18dccf1';
+const QUICK={
+  steven:['وين وصلنا؟','الموجز','اجتمعوا في قهوة المغرب عن '],
+  michael:['الرادار','أدوات جديدة','سوّ خطة تقنية لـ محل للأسابيع الأربعة الجاية','حدّث مجلس خلفان: '],
+  jennifer:['سوّي خطة محتوى أسبوع لـ AI Minute','اكتبي كابشن لبوست عن ','حللي أداء آخر بوستات AI Minute','خطة دخل AI Minute للوصول 1000$'],
+  christina:['صمّمي بوست لحساب دقيقة ذكاء اصطناعي عن ','سكربت ريل 30 ثانية لـ AI Minute عن ','صمّمي ستوري لـ محل عن ','راجعي هذا التصميم: '],
+  matthew:['جدولي','البريد','الحسابات','رتّب لي وقت هالأسبوع بين الدوام والدراسة والمشاريع'],
+};
+function buildOrder(t,task){
+  const who = t.id==='steven' ? '☕ الفريق كامل' : `${t.emoji} ${t.name}`;
+  return `${who}: ${task.trim()}\n\n— أمر من مجلس خلفان. نفّذه كامل بنفسك حسب «دليل تشغيل فريق خلفان»، استخدم الأدوات المتاحة (مثل Canva للتصميم والبحث للأخبار)، وسلّمني النتيجة جاهزة بالقالب المناسب. اسألني فقط إذا ناقصك شي يغيّر النتيجة.`;
+}
+function openSheet(id){ const t=BY[id];
   sheet.innerHTML=`<div class="sh-head"><div class="avatar" style="--c:${t.color}">${t.name[0]}</div><div><h2>${t.emoji} ${t.name}</h2><p>${t.role}</p></div><button class="close" aria-label="إغلاق">×</button></div>
-    <div class="quote">«${t.quote}»</div><h3>المهام</h3><ul>${t.duties.map(x=>`<li>${x}</li>`).join('')}</ul>
-    <h3>المشاريع</h3><div class="chips">${t.projects.map(x=>`<span class="chip">${x}</span>`).join('')}</div>
-    <button class="copy" style="--c:${t.color}">${id==='steven'?'انسخ أمر الاجتماع':'كلّمه — انسخ بداية الطلب'}</button>`;
+    <div class="quote">«${t.quote}»</div>
+    <h3>${id==='steven'?'أمر للفريق':'وش تبي من '+t.name.split(' ')[0]+'؟'}</h3>
+    <div class="chips quick">${QUICK[id].map(q=>`<button class="chip qbtn" type="button">${q.trim()}</button>`).join('')}</div>
+    <textarea id="order" rows="4" placeholder="اكتب أمرك هنا… مثلاً: سوّيلي كذا وعطني كذا"></textarea>
+    <button class="copy" id="send" style="--c:${t.color}">أرسل الأمر ← افتح المشروع</button>
+    <button class="ghost" id="quick">أو افتح محادثة سريعة بالأمر</button>
+    <p class="howto">يتنسخ الأمر، وتفتح صفحة مشروع «Khalfan Majlis». ابدأ محادثة جديدة والصق (اضغط مطولًا ← لصق).</p>
+    <details><summary>المهام والمشاريع</summary><ul>${t.duties.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="chips">${t.projects.map(x=>`<span class="chip">${x}</span>`).join('')}</div></details>`;
+  const ta=sheet.querySelector('#order');
+  try{ ta.value=localStorage.getItem('order_'+id)||''; }catch{}
+  ta.oninput=()=>{ try{ localStorage.setItem('order_'+id,ta.value); }catch{} };
+  sheet.querySelectorAll('.qbtn').forEach(b=>b.onclick=()=>{ ta.value=b.textContent+(b.textContent.endsWith('عن')||b.textContent.endsWith(':')?' ':''); ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); ta.oninput(); });
   sheet.querySelector('.close').onclick=closeSheet;
-  sheet.querySelector('.copy').onclick=async(e)=>{ try{ await navigator.clipboard.writeText(prompt); e.target.textContent='✓ انتسخ — الصقه في Claude'; }catch{ e.target.textContent=prompt; } };
+  const go=async(url,btn)=>{ const task=ta.value.trim(); if(!task){ ta.focus(); ta.placeholder='اكتب الأمر أول 👆'; return; }
+    const order=buildOrder(t,task); let cp=null; try{ cp=navigator.clipboard.writeText(order); }catch{}
+    const a=document.createElement('a'); a.href=url(order); a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
+    let ok=false; try{ await cp; ok=!!cp; }catch{}
+    btn.textContent= ok ? '✓ انتسخ — الصقه في المحادثة' : 'انسخ النص من الخانة يدويًا';
+    if(!ok){ ta.value=order; ta.select(); } else { try{ localStorage.removeItem('order_'+id); }catch{} } };
+  sheet.querySelector('#send').onclick=e=>go(()=>PROJECT_URL,e.target);
+  sheet.querySelector('#quick').onclick=e=>go(o=>'https://claude.ai/new?q='+encodeURIComponent(o),e.target);
   sheet.classList.add('open'); focusOn(id); }
 function closeSheet(){ sheet.classList.remove('open'); }
 
