@@ -682,13 +682,14 @@ function summary(){
   const n=s=>RS.tasks.filter(t=>t.status===s).length;
   const d=new Date().toLocaleDateString('ar-OM',{weekday:'long',day:'numeric',month:'long'});
   let out=`📋 الملخص العام — ${d}\nالمهام: ✅ ${n('done')} خلصت • ⏳ ${n('doing')} شغّالة • 📌 ${n('new')} جديدة\n`;
-  for(const m of MEMBERS){ const L=memberLines(m), t=BY[m];
+  for(const m of MEMBERS){ const L=memberLines(m), t=BY[m], f=(m==='jennifer'||m==='christina');
+    const v=(a,b)=>f?b:a;
     out+=`\n${t.emoji} ${t.name} — ${t.role}\n`;
-    out+=`✅ خلّص: ${L.done.length?L.done.slice(-3).join('، '):'—'}\n`;
-    out+=`⏳ شغّال على: ${L.doing.length?L.doing.join('، '):'—'}\n`;
+    out+=`✅ ${v('خلّص','خلّصت')}: ${L.done.length?L.done.slice(-3).join('، '):'—'}\n`;
+    out+=`⏳ ${v('شغّال','شغّالة')} على: ${L.doing.length?L.doing.join('، '):'—'}\n`;
     out+=`📌 الجاي: ${L.next.length?L.next.join('، '):'—'}\n`;
-    const plan = L.doing.length&&L.next.length ? `يخلّص «${L.doing[0]}» وبعدها يبدأ «${L.next[0]}».` : L.next.length ? `يبدأ بـ «${L.next[0]}».` : L.doing.length ? `يركّز على «${L.doing[0]}» لين يخلص.` : DEFAULT_PLAN[m];
-    out+=`🧭 خطته: ${plan}\n`; }
+    const plan = L.doing.length&&L.next.length ? `${v('يخلّص','تخلّص')} «${L.doing[0]}» وبعدها ${v('يبدأ','تبدأ')} «${L.next[0]}».` : L.next.length ? `${v('يبدأ','تبدأ')} بـ «${L.next[0]}».` : L.doing.length ? `${v('يركّز','تركّز')} على «${L.doing[0]}» لين ${v('يخلص','تخلص')}.` : DEFAULT_PLAN[m];
+    out+=`🧭 ${v('خطته','خطتها')}: ${plan}\n`; }
   const unassigned=RS.tasks.filter(t=>!t.member&&t.status!=='done');
   if(unassigned.length) out+=`\n❔ بدون مسؤول: ${unassigned.map(t=>t.text).join('، ')}\n`;
   const watch=RS.projects.filter(p=>p.status==='yellow'||p.status==='red');
@@ -751,7 +752,7 @@ function renderRozna(){
     body=groups.map(m=>{ const ts=RS.tasks.filter(t=>t.member===m); if(m===null&&!ts.length) return '';
       const t=m?BY[m]:{name:'بدون مسؤول',role:'حدّد لمين',color:'#999',emoji:'❔'};
       return `<div class="mcard" style="--c:${t.color}"><div class="mh"><b>${t.emoji} ${t.name}</b><span>${t.role}</span></div>
-        ${ts.length?ts.slice().reverse().map(x=>`<div class="task ${x.status}"><button class="st" data-st="${x.id}">${ST_LABEL[x.status]}</button><span class="tx">${esc(x.text)}${x.project?` <i>${esc(pName(x.project))}</i>`:''}</span>${m===null?`<span class="as">${MEMBERS.map(mm=>`<button data-as="${x.id}:${mm}">${first(mm)}</button>`).join('')}</span>`:''}<button class="del" data-del="${x.id}" aria-label="حذف">×</button></div>`).join(''):'<p class="empty">ما عنده مهام.</p>'}</div>`; }).join('');
+        ${ts.length?ts.slice().reverse().map(x=>`<div class="task ${x.status}"><button class="st" data-st="${x.id}">${ST_LABEL[x.status]}</button><span class="tx">${esc(x.text)}${x.project?` <i>${esc(pName(x.project))}</i>`:''}</span>${m===null?`<span class="as">${MEMBERS.map(mm=>`<button data-as="${x.id}:${mm}">${first(mm)}</button>`).join('')}</span>`:''}<button class="del" data-del="${x.id}" aria-label="حذف">×</button></div>`).join(''):'<p class="empty">ما عنده مهام حاليًا.</p>'}</div>`; }).join('');
   } else {
     body=`<p class="note">اضغط على الدائرة عشان تغيّر حالة المشروع.</p>`+RS.projects.map(p=>{ const open=RS.tasks.filter(t=>t.project===p.id&&t.status!=='done').length;
       return `<div class="prow"><button class="pdot" style="background:${P_COL[p.status]}" data-ps="${p.id}" aria-label="غيّر الحالة"></button><div><b>${esc(p.name)}</b><span>${P_LBL[p.status]} • ${esc(p.owners)} • ${open} مهام مفتوحة</span></div></div>`; }).join('');
