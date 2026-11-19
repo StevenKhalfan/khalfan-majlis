@@ -69,6 +69,46 @@
   .ghost{width:100%;min-height:44px;margin-top:8px;border:1px solid #e2d3b8;border-radius:14px;background:transparent;font:600 14px 'IBM Plex Sans Arabic',sans-serif;cursor:pointer;color:#5a3820}
   .howto{font-size:12px;opacity:.7;margin:8px 0 0;line-height:1.6}
   details{margin-top:14px;font-size:14px} details summary{cursor:pointer;font-weight:700;color:var(--date);min-height:32px}
+  #rpanel{position:fixed;z-index:7;background:#fffaf0;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.45);
+    left:0;right:0;bottom:0;height:74vh;border-radius:22px 22px 0 0;padding:14px 14px calc(env(safe-area-inset-bottom) + 8px);transform:translateY(105%);transition:transform .35s ease}
+  #rpanel.open{transform:none}
+  @media (min-width:900px){ #rpanel{left:auto;right:16px;top:84px;bottom:16px;height:auto;width:440px;border-radius:22px;transform:translateX(120%)} #rpanel.open{transform:none} }
+  .rhead{display:flex;align-items:center;gap:10px}
+  .rhead h2{margin:0;font-size:18px} .rhead p{margin:2px 0 0;font-size:12px;opacity:.7}
+  .rtabs{display:flex;gap:6px;margin:12px 0 8px;background:#f3e9d6;border-radius:14px;padding:4px}
+  .rtabs button{flex:1;min-height:40px;border:none;border-radius:10px;background:transparent;font:700 14px 'IBM Plex Sans Arabic',sans-serif;color:#5a3820;cursor:pointer}
+  .rtabs button.on{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12);color:#2a1f16}
+  .rbody{flex:1;overflow:auto;display:flex;flex-direction:column;min-height:0}
+  .rlog{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px 8px;min-height:120px}
+  .msg{max-width:88%;padding:10px 12px;border-radius:16px;font-size:14px;line-height:1.7;position:relative}
+  .msg.steven{background:#fff;border:1px solid #eadcc2;align-self:flex-start;border-top-right-radius:4px}
+  .msg.steven b{display:block;font-size:12px;color:#b07a2b;margin-bottom:2px}
+  .msg.me{background:#E3A23B;color:#2a1f16;align-self:flex-end;border-top-left-radius:4px}
+  .mini{margin-top:6px;border:1px solid #e2d3b8;background:#fbf6ec;border-radius:10px;padding:4px 10px;font:600 12px 'IBM Plex Sans Arabic';cursor:pointer;min-height:32px}
+  .rcomp{border-top:1px solid #eadcc2;padding-top:8px}
+  .who{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none} .who::-webkit-scrollbar{display:none}
+  .pick{flex:none;min-height:36px;border:1px solid #e2d3b8;background:#fff;border-radius:18px;padding:4px 12px;font:600 13px 'IBM Plex Sans Arabic';cursor:pointer;color:#2a1f16}
+  .pick.on{background:#2a1f16;color:#fff;border-color:#2a1f16}
+  #rtext{width:100%;border:1.5px solid #e2d3b8;border-radius:14px;padding:10px 12px;font:15px 'IBM Plex Sans Arabic',sans-serif;resize:none;background:#fff;color:#2a1f16}
+  #rtext:focus{outline:none;border-color:#E3A23B}
+  .ract{display:flex;gap:8px;margin-top:8px}
+  .rbtn{flex:1;min-height:46px;border-radius:14px;border:1px solid #e2d3b8;background:#fff;font:700 14px 'IBM Plex Sans Arabic';cursor:pointer;color:#5a3820}
+  .rbtn.main{background:#2a1f16;color:#fff;border-color:#2a1f16}
+  .mcard{border:1px solid #eadcc2;border-inline-start:5px solid var(--c);border-radius:14px;padding:10px;margin-bottom:10px;background:#fff}
+  .mh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px} .mh span{font-size:12px;opacity:.65}
+  .task{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed #efe3cc;font-size:14px;flex-wrap:wrap}
+  .task .tx{flex:1;min-width:140px} .task i{font-style:normal;font-size:11px;background:#f3e9d6;border-radius:8px;padding:1px 6px;margin-inline-start:4px}
+  .task.done .tx{opacity:.55;text-decoration:line-through}
+  .st{min-width:58px;min-height:32px;border:none;border-radius:10px;font:700 12px 'IBM Plex Sans Arabic';cursor:pointer;background:#f3e9d6;color:#5a3820}
+  .task.doing .st{background:#fde7c2;color:#8a5a12} .task.done .st{background:#dff2e3;color:#2e7d4a}
+  .del{border:none;background:transparent;font-size:18px;opacity:.4;cursor:pointer;min-width:32px;min-height:32px}
+  .as{display:flex;gap:4px;width:100%} .as button{flex:1;min-height:32px;border:1px solid #e2d3b8;border-radius:10px;background:#fbf6ec;font:600 12px 'IBM Plex Sans Arabic';cursor:pointer}
+  .prow{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid #efe3cc}
+  .prow b{display:block;font-size:15px} .prow span{font-size:12px;opacity:.7}
+  .pdot{flex:none;width:28px;height:28px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px #d8c8aa;cursor:pointer}
+  .note,.empty{font-size:13px;opacity:.65;margin:6px 2px} .rnote{font-size:11px;opacity:.55;margin:6px 0 0;text-align:center}
+  #ropen{position:fixed;z-index:6;bottom:calc(env(safe-area-inset-bottom) + 16px);left:50%;transform:translateX(-50%);display:none;min-height:50px;padding:0 22px;border:none;border-radius:25px;background:#E3A23B;color:#2a1f16;font:700 15px 'IBM Plex Sans Arabic';box-shadow:0 6px 18px rgba(0,0,0,.4);cursor:pointer}
+  #ropen.show{display:block}
   .hint{position:fixed;z-index:4;bottom:calc(env(safe-area-inset-bottom) + 76px);left:50%;transform:translateX(-50%);
     background:rgba(27,19,13,.75);color:var(--sand);padding:8px 14px;border-radius:16px;font-size:13px;white-space:nowrap;transition:opacity .6s}
   #loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:#1b130d;color:var(--sand);font-size:18px;transition:opacity .6s}
@@ -88,13 +128,16 @@
 <div id="scene"></div>
 <div id="labels"></div>
 <div class="bar">
-  <div class="brand">مجلس خلفان <small>المرحلة ١ • v3.3</small></div>
+  <div class="brand">مجلس خلفان <small>المرحلة ١ • v4</small></div>
   <button class="btn on" id="bMajlis">المجلس</button>
   <button class="btn" id="bCoffee">قهوة المغرب</button>
   <button class="btn" id="bTop">منظر علوي</button>
+  <button class="btn" id="bRozna">⭐ الروزنة</button>
 </div>
 <div class="hint" id="hint">اسحب للتدوير • قرّب بإصبعين أو العجلة • اضغط على أي عضو</div>
 <nav id="crew" aria-label="الفريق"></nav>
+<aside id="rpanel" aria-label="روزنة المدير العام"></aside>
+<button id="ropen">⭐ افتح مكتب ستيفن</button>
 <aside id="sheet" aria-live="polite"></aside>
 
 <script type="module">
@@ -535,6 +578,202 @@ const SEATS={ steven:[0,-S+0.05], michael:[-S+0.05,-1.1], jennifer:[-S+0.05,1.1]
 const coffeeChars=[];
 for(const t of TEAM){ const c=makeCharacter(t.id,true); const [x,z]=SEATS[t.id]; c.position.set(x,0.2,z); c.rotation.y=Math.atan2(-x,-z); coffee.add(c); coffeeChars.push(c); }
 
+/* ================= الروزنة: مكتب المدير العام ================= */
+const rozna=new THREE.Group(); rozna.position.set(-120,0,0); rozna.visible=false; scene.add(rozna);
+const RX=-120;
+const takeLast=()=>{ const o=majlis.children[majlis.children.length-1]; rozna.add(o); return o; };
+{ // الأرضية الخشبية
+  const wood=canvasTex(512,512,(g,w,h)=>{ for(let i=0;i<8;i++){ g.fillStyle=i%2?'#8a5a36':'#946240'; g.fillRect(0,i*64,w,64); g.fillStyle='rgba(0,0,0,.12)'; g.fillRect(0,i*64,w,2); for(let k=0;k<3;k++){ g.fillRect(((i*137+k*173)%w),i*64,2,64);} } },[3,3]);
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(14,11),new THREE.MeshStandardMaterial({map:wood,roughness:.7})); fl.rotation.x=-Math.PI/2; rozna.add(fl);
+  const back=archWall(14,5.6,3,2.0,3.3,0.9); at(back,0,0,-5.5-0.5); rozna.add(back);
+  const gl=new THREE.Mesh(new THREE.PlaneGeometry(14,5.6),new THREE.MeshBasicMaterial({map:canvasTex(16,256,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#e9845a');gr.addColorStop(.6,'#f6b26b');gr.addColorStop(1,'#ffe3b0');g.fillStyle=gr;g.fillRect(0,0,w,h);})}));
+  at(gl,0,2.8,-6.8); rozna.add(gl);
+  for(let i=0;i<3;i++){ const cx=-14/2+(14/3)*(i+.5); for(let k=-2;k<=2;k++){ const v=box(0.05,2.6,0.05,lattice); at(v,cx+k*0.38,2.3,-5.75); rozna.add(v); } for(let k=0;k<5;k++){ const hz=box(2,0.05,0.05,lattice); at(hz,cx,1.0+k*0.6,-5.75); rozna.add(hz); } }
+  [-1,1].forEach(s=>{ const w=box(0.4,4.2,11,sideM); at(w,s*7,2.1,0); rozna.add(w); const t=box(0.45,0.18,11,trimM); at(t,s*7,4.2,0); rozna.add(t); });
+  const sg=new THREE.Mesh(new THREE.PlaneGeometry(4.6,0.9),new THREE.MeshBasicMaterial({map:signTex('روزنة المدير العام','#5a3820','#f5e6c8')})); at(sg,0,4.85,-5.45); rozna.add(sg);
+  const rg=new THREE.Mesh(new THREE.PlaneGeometry(6.5,4.5),new THREE.MeshStandardMaterial({map:omaniFabric('#7a1f1a'),roughness:1})); rg.rotation.x=-Math.PI/2; at(rg,0,0.012,-1.2); rozna.add(rg);
+}
+// المكتب التنفيذي
+const rDesk=desk(0,-2.2,4.2); takeLast();
+laptop(rozna,-0.7,1.0,-2.25,0,'#E3A23B','روزنة المدير');
+const rd=dallaG.clone(); at(rd,1.4,1.0,-2.5); rozna.add(rd);
+for(const [x,z] of [[1.0,-2.0],[1.15,-2.2]]){ const f=cyl(0.055,0.04,0.08,mat(0xffffff,{r:.3}),14); at(f,x,1.04,z); rozna.add(f); }
+const namePlate=new THREE.Mesh(new THREE.PlaneGeometry(2.2,0.42),new THREE.MeshBasicMaterial({map:signTex('ستيفن خلفان — المدير العام','#3a2716','#E3A23B',1024,200,80)})); at(namePlate,0,0.62,-1.53); rozna.add(namePlate);
+officeChair(0,-3.75,0,0xE3A23B); takeLast();
+officeChair(-1.3,-0.2,Math.PI+0.25,0x8a2620); takeLast();
+officeChair(1.3,-0.2,Math.PI-0.25,0x8a2620); takeLast();
+palm(-5.6,-4.4); takeLast(); palm(5.6,-4.4); takeLast();
+floorLantern(rozna,-5.8,3.6); floorLantern(rozna,5.8,3.6);
+const rLight=new THREE.PointLight(0xffd29a,22,18,1.5); at(rLight,0,4.5,1); rozna.add(rLight);
+// ستيفن على مكتبه
+const roznaSteven=makeCharacter('steven'); roznaSteven.position.set(0,0,-3.2); rozna.add(roznaSteven);
+const roznaChars=[roznaSteven];
+
+/* ---------- بيانات الروزنة (محفوظة على هذا الجهاز) ---------- */
+const RKEY='khalfan_rozna_v1';
+const MEMBERS=['michael','jennifer','christina','matthew'];
+const SEED={
+  projects:[
+    {id:'mahal',name:'محل',owners:'مايكل + جنيفر',status:'yellow'},
+    {id:'aim',name:'AI Minute',owners:'جنيفر + كرستينا',status:'green'},
+    {id:'acad',name:'أكاديمية ستيفن خلفان',owners:'مايكل + جنيفر + ماثيو',status:'green'},
+    {id:'majlis',name:'مجلس خلفان 3D',owners:'مايكل + كرستينا',status:'green'},
+    {id:'office',name:'مكتب ستيفن',owners:'مايكل',status:'green'},
+    {id:'brand',name:'@stevenkhalfan',owners:'جنيفر + كرستينا',status:'green'},
+    {id:'study',name:'الدراسة (ماجستير + CIPS)',owners:'ماثيو',status:'green'},
+    {id:'px',name:'Steven Project X',owners:'مايكل',status:'blue'},
+    {id:'eo',name:'Explore Oman',owners:'جنيفر',status:'blue'},
+    {id:'thor',name:'Thor',owners:'مايكل',status:'blue'},
+  ],
+  tasks:[
+    {id:1,member:'michael',text:'المرحلة 1 من مجلس خلفان',project:'majlis',status:'done'},
+    {id:2,member:'michael',text:'خانة الأوامر لكل عضو في المجلس',project:'majlis',status:'done'},
+    {id:3,member:'michael',text:'بناء الروزنة (مكتب المدير العام)',project:'majlis',status:'doing'},
+    {id:4,member:'michael',text:'رأي المجلس في الأسئلة السبعة للأكاديمية',project:'acad',status:'done'},
+    {id:5,member:'christina',text:'اعتماد شكل الشخصيات والمجلس وقهوة المغرب',project:'majlis',status:'done'},
+    {id:6,member:'jennifer',text:'خطة محتوى شهرية لـ محل و AI Minute',project:'aim',status:'new'},
+    {id:7,member:'matthew',text:'استلام جدول الدوام والدراسة والاشتراكات من ستيفن',project:'study',status:'new'},
+  ],
+  log:[], lastCheckin:'', nextId:8,
+};
+let RS; try{ RS=JSON.parse(localStorage.getItem(RKEY)||'null'); }catch{ RS=null; }
+if(!RS||!RS.projects) RS=JSON.parse(JSON.stringify(SEED));
+const saveRS=()=>{ try{ localStorage.setItem(RKEY,JSON.stringify(RS)); }catch{} drawBoards(); };
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const today=()=>{ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); };
+const ST_LABEL={new:'جديد',doing:'شغّال',done:'خلص'}, ST_NEXT={new:'doing',doing:'done',done:'new'};
+const P_COL={green:'#3cb371',yellow:'#e0b13b',red:'#d9534f',blue:'#7aa6d6'}, P_LBL={green:'على المسار',yellow:'يحتاج دفعة',red:'متعثر',blue:'فكرة'}, P_NEXT={green:'yellow',yellow:'red',red:'blue',blue:'green'};
+const ROLE_WORD={michael:'تقنية',jennifer:'تسويق',christina:'تصميم',matthew:'مكتب ومالية'};
+const KW={
+  christina:['تصميم','صمم','صمّم','صممي','صمّمي','بوست','ستوري','شعار','لوقو','لوجو','هوية','مونتاج','فيديو','ريل','ريلز','صورة','صور','كاركتر','شخصية','غلاف','ثمبنيل','بوستر','فلاير','كانفا','canva','design'],
+  jennifer:['تسويق','اعلان','إعلان','اعلانات','إعلانات','حملة','كابشن','محتوى','متابعين','انستغرام','إنستغرام','انستقرام','تيك توك','تيكتوك','سناب','جمهور','مؤثر','هاشتاق','خطة نشر','تفاعل','وصول','دخل الحساب','monetization','marketing'],
+  michael:['كود','برمجة','برمج','موقع','تطبيق','تقني','تقنية','رادار','أداة','اداة','أدوات','ادوات','سكيل','skill','connector','كونكتر','github','قيت هب','خادم','سيرفر','api','supabase','vercel','أتمتة','اتمتة','الذكاء الاصطناعي الجديد','أخبار الذكاء','اخبار الذكاء','دومين','نطاق','استضافة','بوت','agent','وكيل'],
+  matthew:['ايميل','إيميل','ايميلات','إيميلات','بريد','جدول','جدولي','وقت','موعد','مواعيد','اجتماع','دراسة','محاضرة','اختبار','امتحان','واجب','تسليم','مالية','فلوس','اشتراك','اشتراكات','فاتورة','فواتير','ميزانية','دخل','مصروف','مصاريف','حسابات','قانوني','محامي','تسجيل تجاري','سجل تجاري'],
+};
+const PROJ_KW={mahal:['محل','mahal','موردين','مورد'],aim:['ai minute','دقيقة ذكاء','aiminute'],acad:['أكاديمية','اكاديمية','الأكاديمية','تداول','المحاكي','طلاب'],majlis:['المجلس','مجلس خلفان','الروزنة'],office:['مكتب ستيفن'],brand:['stevenkhalfan','حسابي الشخصي'],study:['ماجستير','cips','دراسة','محاضرة','اختبار'],px:['project x','مقاولات'],eo:['explore oman','سياحة'],thor:['thor','ثور']};
+function routeTask(text){ const t=text.toLowerCase(); let best=null,score=0;
+  for(const m of MEMBERS){ const s=KW[m].reduce((a,k)=>a+(t.includes(k.toLowerCase())?1:0),0); if(s>score){score=s;best=m;} } return best; }
+function projectOf(text){ const t=text.toLowerCase(); for(const [p,ks] of Object.entries(PROJ_KW)) if(ks.some(k=>t.includes(k.toLowerCase()))) return p; return null; }
+const pName=id=>(RS.projects.find(p=>p.id===id)||{}).name||'';
+const first=id=>BY[id].name.split(' ')[0];
+function stevenSay(text,extra={}){ RS.log.push({from:'steven',text,t:Date.now(),...extra}); RS.log=RS.log.slice(-40); }
+
+function distribute(raw,forced){
+  const lines=raw.split(/\n|؛|•|\s-\s/).map(s=>s.trim()).filter(s=>s.length>1);
+  if(!lines.length) return;
+  RS.log.push({from:'me',text:raw.trim(),t:Date.now()});
+  const done=[], pending=[];
+  for(const line of lines){ const m=forced&&forced!=='auto'?forced:routeTask(line); const task={id:RS.nextId++,member:m,text:line,project:projectOf(line),status:'new'};
+    RS.tasks.push(task); (m?done:pending).push(task); }
+  let msg = done.length ? `تمام يا ستيفن ✓ وزّعت ${done.length===1?'المهمة':done.length+' مهام'}:\n`+done.map(t=>`• ${BY[t.member].emoji} ${first(t.member)} ← «${t.text}»${forced&&forced!=='auto'?'':' ('+ROLE_WORD[t.member]+')'}${t.project?' — '+pName(t.project):''}`).join('\n') : '';
+  if(pending.length) msg += (msg?'\n\n':'')+`ما عرفت لمين ${pending.length===1?'هذي':'هذول'}، حددها لي تحت في «الفريق»:\n`+pending.map(t=>`• ❔ «${t.text}»`).join('\n');
+  stevenSay(msg); saveRS(); renderRozna();
+}
+function memberLines(m){ const ts=RS.tasks.filter(t=>t.member===m);
+  const pick=s=>ts.filter(t=>t.status===s).map(t=>t.text);
+  return {done:pick('done'),doing:pick('doing'),next:pick('new')}; }
+const DEFAULT_PLAN={
+  michael:'الرادار اليومي لأخبار الذكاء الاصطناعي، وتقرير الأدوات الجديدة كل أحد، ومتابعة مهام الفريق.',
+  jennifer:'تجهيز تقويم النشر وتحليل أداء الحسابات من بيانات حقيقية.',
+  christina:'مراجعة كل تصميم قبل النشر والحفاظ على الهويات.',
+  matthew:'ترتيب جدولك الأسبوعي وموجز البريد ومتابعة الاشتراكات.',
+};
+function summary(){
+  const n=s=>RS.tasks.filter(t=>t.status===s).length;
+  const d=new Date().toLocaleDateString('ar-OM',{weekday:'long',day:'numeric',month:'long'});
+  let out=`📋 الملخص العام — ${d}\nالمهام: ✅ ${n('done')} خلصت • ⏳ ${n('doing')} شغّالة • 📌 ${n('new')} جديدة\n`;
+  for(const m of MEMBERS){ const L=memberLines(m), t=BY[m];
+    out+=`\n${t.emoji} ${t.name} — ${t.role}\n`;
+    out+=`✅ خلّص: ${L.done.length?L.done.slice(-3).join('، '):'—'}\n`;
+    out+=`⏳ شغّال على: ${L.doing.length?L.doing.join('، '):'—'}\n`;
+    out+=`📌 الجاي: ${L.next.length?L.next.join('، '):'—'}\n`;
+    const plan = L.doing.length&&L.next.length ? `يخلّص «${L.doing[0]}» وبعدها يبدأ «${L.next[0]}».` : L.next.length ? `يبدأ بـ «${L.next[0]}».` : L.doing.length ? `يركّز على «${L.doing[0]}» لين يخلص.` : DEFAULT_PLAN[m];
+    out+=`🧭 خطته: ${plan}\n`; }
+  const unassigned=RS.tasks.filter(t=>!t.member&&t.status!=='done');
+  if(unassigned.length) out+=`\n❔ بدون مسؤول: ${unassigned.map(t=>t.text).join('، ')}\n`;
+  const watch=RS.projects.filter(p=>p.status==='yellow'||p.status==='red');
+  if(watch.length) out+=`\n⚠️ مشاريع تحتاج انتباهك: ${watch.map(p=>p.name+' ('+P_LBL[p.status]+')').join('، ')}`;
+  return out.trim();
+}
+function dailyCheckin(){
+  if(RS.lastCheckin===today()) return;
+  RS.lastCheckin=today(); const h=new Date().getHours();
+  const open=MEMBERS.map(m=>`${first(m)} (${RS.tasks.filter(t=>t.member===m&&t.status!=='done').length})`).join('، ');
+  stevenSay(`${h<12?'صباح الخير':'مساء الخير'} يا ستيفن ☀️\nوش تبي من الشباب اليوم؟ اكتب الأشغال تحت، كل شغلة في سطر، وأنا أوزّعها على الكل حسب تخصصه.\nالمهام المفتوحة الحين: ${open}.`);
+  saveRS();
+}
+
+/* ---------- لوحات الجدران ---------- */
+const boardCanvas=document.createElement('canvas'); boardCanvas.width=1024; boardCanvas.height=640;
+const boardT=new THREE.CanvasTexture(boardCanvas); boardT.colorSpace=THREE.SRGBColorSpace;
+const teamCanvas=document.createElement('canvas'); teamCanvas.width=1024; teamCanvas.height=640;
+const teamT=new THREE.CanvasTexture(teamCanvas); teamT.colorSpace=THREE.SRGBColorSpace;
+function drawBoards(){
+  let g=boardCanvas.getContext('2d'), w=1024, h=640;
+  g.fillStyle='#14202c'; g.fillRect(0,0,w,h); g.fillStyle='#E3A23B'; g.font='700 50px "IBM Plex Sans Arabic"'; g.textAlign='right'; g.direction='rtl'; g.fillText('لوحة المشاريع',w-36,66);
+  g.font='600 32px "IBM Plex Sans Arabic"';
+  RS.projects.forEach((p,i)=>{ const col=i<5?0:1, row=i%5, x=w-36-col*490, y=135+row*98;
+    g.fillStyle=P_COL[p.status]; g.beginPath(); g.arc(x-14,y-11,13,0,7); g.fill();
+    g.fillStyle='#f3ead8'; g.fillText(p.name,x-40,y);
+    const open=RS.tasks.filter(t=>t.project===p.id&&t.status!=='done').length;
+    g.fillStyle='rgba(243,234,216,.6)'; g.font='400 24px "IBM Plex Sans Arabic"'; g.fillText(`${P_LBL[p.status]} • ${open} مفتوحة`,x-40,y+34); g.font='600 32px "IBM Plex Sans Arabic"'; });
+  boardT.needsUpdate=true;
+  g=teamCanvas.getContext('2d');
+  g.fillStyle='#fbf6ec'; g.fillRect(0,0,w,h); g.fillStyle='#5a3820'; g.font='700 50px "IBM Plex Sans Arabic"'; g.textAlign='right'; g.direction='rtl'; g.fillText('الفريق اليوم',w-36,66);
+  MEMBERS.forEach((m,i)=>{ const t=BY[m], y=110+i*130, L=memberLines(m);
+    g.fillStyle=t.color; g.fillRect(w-46,y,14,104); g.fillStyle='#2a1f16'; g.font='700 38px "IBM Plex Sans Arabic"'; g.fillText(t.name,w-66,y+42);
+    g.font='400 26px "IBM Plex Sans Arabic"'; g.fillStyle='#6b5a48'; g.fillText(`✅ ${L.done.length}   ⏳ ${L.doing.length}   📌 ${L.next.length}`,w-66,y+86);
+    const cur=(L.doing[0]||L.next[0]||'—'); g.textAlign='left'; g.fillStyle='#2a1f16'; g.font='600 26px "IBM Plex Sans Arabic"'; g.fillText(cur.length>26?cur.slice(0,26)+'…':cur,40,y+64); g.textAlign='right'; });
+  teamT.needsUpdate=true;
+}
+{ const f1=box(0.08,2.5,4.3,mat(0x3a2716)); at(f1,-6.75,2.4,-1.2); rozna.add(f1);
+  const b1=new THREE.Mesh(new THREE.PlaneGeometry(4.1,2.56),new THREE.MeshBasicMaterial({map:boardT})); b1.rotation.y=Math.PI/2; at(b1,-6.7,2.4,-1.2); rozna.add(b1);
+  const f2=box(0.08,2.5,4.3,mat(0x3a2716)); at(f2,6.75,2.4,-1.2); rozna.add(f2);
+  const b2=new THREE.Mesh(new THREE.PlaneGeometry(4.1,2.56),new THREE.MeshBasicMaterial({map:teamT})); b2.rotation.y=-Math.PI/2; at(b2,6.7,2.4,-1.2); rozna.add(b2); }
+drawBoards();
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(drawBoards);
+
+/* ---------- واجهة الروزنة ---------- */
+const rp=document.getElementById('rpanel'), rOpen=document.getElementById('ropen');
+let rTab='orders', rForced='auto';
+function renderRozna(){
+  const tabs=[['orders','الأوامر'],['team','الفريق'],['projects','المشاريع']];
+  let body='';
+  if(rTab==='orders'){
+    body=`<div class="rlog" id="rlog">${RS.log.map((l,i)=>`<div class="msg ${l.from}">${l.from==='steven'?'<b>⭐ ستيفن</b>':''}<div>${esc(l.text).replace(/\n/g,'<br>')}</div>${l.from==='steven'&&l.copy?`<button class="mini" data-copy="${i}">نسخ</button>`:''}</div>`).join('')||'<p class="empty">اكتب أوامرك تحت، وستيفن يوزّعها على الفريق.</p>'}</div>
+    <div class="rcomp">
+      <div class="who">${[['auto','⭐ ستيفن يوزّع'],...MEMBERS.map(m=>[m,BY[m].emoji+' '+first(m)])].map(([k,l])=>`<button class="pick ${rForced===k?'on':''}" data-pick="${k}">${l}</button>`).join('')}</div>
+      <textarea id="rtext" rows="3" placeholder="اكتب الأشغال، كل شغلة في سطر…"></textarea>
+      <div class="ract"><button class="rbtn main" id="rsend">وزّع ←</button><button class="rbtn" id="rsum">📋 ملخص عام</button></div>
+    </div>`;
+  } else if(rTab==='team'){
+    const groups=[...MEMBERS,null];
+    body=groups.map(m=>{ const ts=RS.tasks.filter(t=>t.member===m); if(m===null&&!ts.length) return '';
+      const t=m?BY[m]:{name:'بدون مسؤول',role:'حدّد لمين',color:'#999',emoji:'❔'};
+      return `<div class="mcard" style="--c:${t.color}"><div class="mh"><b>${t.emoji} ${t.name}</b><span>${t.role}</span></div>
+        ${ts.length?ts.slice().reverse().map(x=>`<div class="task ${x.status}"><button class="st" data-st="${x.id}">${ST_LABEL[x.status]}</button><span class="tx">${esc(x.text)}${x.project?` <i>${esc(pName(x.project))}</i>`:''}</span>${m===null?`<span class="as">${MEMBERS.map(mm=>`<button data-as="${x.id}:${mm}">${first(mm)}</button>`).join('')}</span>`:''}<button class="del" data-del="${x.id}" aria-label="حذف">×</button></div>`).join(''):'<p class="empty">ما عنده مهام.</p>'}</div>`; }).join('');
+  } else {
+    body=`<p class="note">اضغط على الدائرة عشان تغيّر حالة المشروع.</p>`+RS.projects.map(p=>{ const open=RS.tasks.filter(t=>t.project===p.id&&t.status!=='done').length;
+      return `<div class="prow"><button class="pdot" style="background:${P_COL[p.status]}" data-ps="${p.id}" aria-label="غيّر الحالة"></button><div><b>${esc(p.name)}</b><span>${P_LBL[p.status]} • ${esc(p.owners)} • ${open} مهام مفتوحة</span></div></div>`; }).join('');
+  }
+  rp.innerHTML=`<div class="rhead"><div class="avatar" style="--c:#E3A23B">س</div><div><h2>روزنة المدير العام</h2><p>ستيفن يوزّع الشغل ويعطيك الملخص</p></div><button class="close" id="rclose" aria-label="تصغير">−</button></div>
+    <div class="rtabs">${tabs.map(([k,l])=>`<button class="${rTab===k?'on':''}" data-tab="${k}">${l}</button>`).join('')}</div>
+    <div class="rbody">${body}</div><p class="rnote">💾 محفوظ على هذا الجهاز فقط.</p>`;
+  rp.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ rTab=b.dataset.tab; renderRozna(); });
+  rp.querySelector('#rclose').onclick=()=>{ rp.classList.remove('open'); rOpen.classList.add('show'); };
+  rp.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{ rForced=b.dataset.pick; const v=rp.querySelector('#rtext').value; renderRozna(); const ta=rp.querySelector('#rtext'); ta.value=v; ta.focus(); });
+  const send=rp.querySelector('#rsend'); if(send) send.onclick=()=>{ const v=rp.querySelector('#rtext').value; if(!v.trim()){ rp.querySelector('#rtext').focus(); return; } distribute(v,rForced); };
+  const sum=rp.querySelector('#rsum'); if(sum) sum.onclick=()=>{ stevenSay(summary(),{copy:true}); saveRS(); renderRozna(); };
+  rp.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(RS.log[+b.dataset.copy].text); b.textContent='✓ انتسخ'; }catch{ b.textContent='ما قدرت أنسخ'; } });
+  rp.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ const t=RS.tasks.find(x=>x.id==b.dataset.st); t.status=ST_NEXT[t.status]; saveRS(); renderRozna(); });
+  rp.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ RS.tasks=RS.tasks.filter(x=>x.id!=b.dataset.del); saveRS(); renderRozna(); });
+  rp.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>{ const [id,m]=b.dataset.as.split(':'); const t=RS.tasks.find(x=>x.id==id); t.member=m; stevenSay(`تمام، «${t.text}» صارت عند ${first(m)}.`); saveRS(); renderRozna(); });
+  rp.querySelectorAll('[data-ps]').forEach(b=>b.onclick=()=>{ const p=RS.projects.find(x=>x.id===b.dataset.ps); p.status=P_NEXT[p.status]; saveRS(); renderRozna(); });
+  const log=rp.querySelector('#rlog'); if(log) log.scrollTop=log.scrollHeight;
+}
+function openRozna(){ dailyCheckin(); renderRozna(); rp.classList.add('open'); rOpen.classList.remove('show'); }
+rOpen.onclick=openRozna;
+
 /* ================= الملصقات والتفاعل ================= */
 const labelsEl=document.getElementById('labels'); const tags={};
 function mkTag(t,key){ const d=document.createElement('div'); d.className='tag'; d.style.setProperty('--c',t.color);
@@ -543,7 +782,7 @@ function mkTag(t,key){ const d=document.createElement('div'); d.className='tag';
   d.addEventListener('click',e=>{ e.stopPropagation(); openSheet(t.id); }); labelsEl.appendChild(d); tags[key]=d; }
 TEAM.forEach(t=>{ mkTag(t,'m_'+t.id); mkTag(t,'c_'+t.id); });
 const crew=document.getElementById('crew');
-TEAM.forEach(t=>{ const b=document.createElement('button'); b.className='mem'; b.style.setProperty('--c',t.color); b.innerHTML=`<i>${t.name[0]}</i>${t.name.split(' ')[0]}`; b.onclick=()=>openSheet(t.id); crew.appendChild(b); });
+TEAM.forEach(t=>{ const b=document.createElement('button'); b.className='mem'; b.style.setProperty('--c',t.color); b.innerHTML=`<i>${t.name[0]}</i>${t.name.split(' ')[0]}`; b.onclick=()=> t.id==='steven' ? setMode('rozna') : openSheet(t.id); crew.appendChild(b); });
 const sheet=document.getElementById('sheet');
 const PROJECT_URL='https://claude.ai/project/01a1f36a-a5f0-7218-83ae-684fe18dccf1';
 const QUICK={
@@ -557,7 +796,7 @@ function buildOrder(t,task){
   const who = t.id==='steven' ? '☕ الفريق كامل' : `${t.emoji} ${t.name}`;
   return `${who}: ${task.trim()}\n\n— أمر من مجلس خلفان. نفّذه كامل بنفسك حسب «دليل تشغيل فريق خلفان»، استخدم الأدوات المتاحة (مثل Canva للتصميم والبحث للأخبار)، وسلّمني النتيجة جاهزة بالقالب المناسب. اسألني فقط إذا ناقصك شي يغيّر النتيجة.`;
 }
-function openSheet(id){ const t=BY[id];
+function openSheet(id){ if(id==='steven'){ setMode('rozna'); return; } const t=BY[id];
   sheet.innerHTML=`<div class="sh-head"><div class="avatar" style="--c:${t.color}">${t.name[0]}</div><div><h2>${t.emoji} ${t.name}</h2><p>${t.role}</p></div><button class="close" aria-label="إغلاق">×</button></div>
     <div class="quote">«${t.quote}»</div>
     <h3>${id==='steven'?'أمر للفريق':'وش تبي من '+t.name.split(' ')[0]+'؟'}</h3>
@@ -591,17 +830,20 @@ function viewFor(m){
   const asp=innerWidth/innerHeight, clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
   const k=clamp(1.85/asp,1,3.4), k2=clamp(1.6/asp,1,2.6);
   const hh=Math.atan(Math.tan(camera.fov*Math.PI/360)*asp);
+  if(m==='rozna') return asp<1 ? {pos:[RX,6.2,10.5],target:[RX,-1.8,-1.6]} : (innerWidth>=900 ? {pos:[RX+2.6,4.6,8.6],target:[RX+2.6,1.2,-2]} : {pos:[RX,4.6,8.6],target:[RX,1.2,-2]});
   if(asp<1 && m==='majlis'){ const d=11.8/Math.tan(hh), el=0.98; return {pos:[0,0.6+d*Math.sin(el),1+d*Math.cos(el)],target:[0,0.6,1]}; }
   if(asp<1 && m==='coffee'){ const d=4.9/Math.tan(hh), el=0.8; return {pos:[120,0.6+d*Math.sin(el),-0.3+d*Math.cos(el)],target:[120,0.6,-0.3]}; }
   if(m==='majlis') return {pos:[0,14*k,1.5+21*k],target:[0,0.6,1]};
   if(m==='top') return {pos:[0,34*clamp(1.4/asp,1,2.4),0.01],target:[0,0,0]};
   return {pos:[120,7.2*k2,9.8*k2],target:[120,0.6,-0.6]};
 }
-function setMode(m){ mode=m; majlis.visible=m!=='coffee'; coffee.visible=m==='coffee';
+function setMode(m){ mode=m; majlis.visible=(m==='majlis'||m==='top'); coffee.visible=m==='coffee'; rozna.visible=m==='rozna';
+  document.getElementById('crew').style.display=m==='rozna'?'none':'';
+  if(m==='rozna'){ openRozna(); } else { rp.classList.remove('open'); rOpen.classList.remove('show'); }
   controls.maxPolarAngle=m==='top'?0.01:Math.PI*0.47; controls.enableRotate=m!=='top';
   scene.background=m==='coffee'?null:new THREE.Color(0x1b130d);
-  ['bMajlis','bCoffee','bTop'].forEach(b=>document.getElementById(b).classList.remove('on'));
-  document.getElementById({majlis:'bMajlis',coffee:'bCoffee',top:'bTop'}[m]).classList.add('on');
+  ['bMajlis','bCoffee','bTop','bRozna'].forEach(b=>document.getElementById(b).classList.remove('on'));
+  document.getElementById({majlis:'bMajlis',coffee:'bCoffee',top:'bTop',rozna:'bRozna'}[m]).classList.add('on');
   const v=viewFor(m); flyTo(v.pos,v.target); closeSheet(); }
 function focusOn(id){ if(mode==='top') return; const list=mode==='coffee'?coffeeChars:majlisChars; const c=list.find(x=>x.userData.id===id); if(!c) return;
   const p=new THREE.Vector3(); c.getWorldPosition(p); const f=new THREE.Vector3(0,0,1).applyQuaternion(c.quaternion).setY(0).normalize();
@@ -610,23 +852,25 @@ function focusOn(id){ if(mode==='top') return; const list=mode==='coffee'?coffee
 document.getElementById('bMajlis').onclick=()=>setMode('majlis');
 document.getElementById('bCoffee').onclick=()=>setMode('coffee');
 document.getElementById('bTop').onclick=()=>setMode('top');
+document.getElementById('bRozna').onclick=()=>setMode('rozna');
 
 const ray=new THREE.Raycaster(), ptr=new THREE.Vector2(); let downAt=null;
 renderer.domElement.addEventListener('pointerdown',e=>{ downAt=[e.clientX,e.clientY]; });
 renderer.domElement.addEventListener('pointerup',e=>{ if(!downAt) return; const moved=Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1]); downAt=null; if(moved>8) return;
   ptr.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1); ray.setFromCamera(ptr,camera);
+  if(mode==='rozna'){ if(ray.intersectObjects(roznaChars,true)[0]) openRozna(); return; }
   const targets=mode==='coffee'?coffeeChars:[...majlisChars,coffeeSign]; const hit=ray.intersectObjects(targets,true)[0];
   if(!hit){ closeSheet(); return; } if(hit.object.userData.go==='coffee'){ setMode('coffee'); return; } if(hit.object.userData.id) openSheet(hit.object.userData.id); });
 
 const v3=new THREE.Vector3(); const clk=new THREE.Clock();
-function placeTags(){ const list=mode==='coffee'?coffeeChars.map(c=>['c_',c]):majlisChars.map(c=>['m_',c]);
+function placeTags(){ const list=mode==='rozna'?[]:mode==='coffee'?coffeeChars.map(c=>['c_',c]):majlisChars.map(c=>['m_',c]);
   Object.values(tags).forEach(d=>d.classList.add('hidden'));
   for(const [pre,c] of list){ c.getWorldPosition(v3); v3.y+=(c.userData.seated?2.35:3.0); v3.project(camera); if(v3.z>1) continue;
     const d=tags[pre+c.userData.id]; d.style.left=((v3.x+1)/2*innerWidth)+'px'; d.style.top=((1-v3.y)/2*innerHeight)+'px'; d.classList.remove('hidden'); } }
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function loop(){ const t=clk.getElapsedTime();
   if(tween){ const k=Math.min(1,(performance.now()-tween.start)/tween.ms), e=ease(k); camera.position.lerpVectors(tween.p0,tween.p1,e); controls.target.lerpVectors(tween.t0,tween.t1,e); if(k>=1) tween=null; }
-  for(const c of (mode==='coffee'?coffeeChars:majlisChars)){ const b=c.userData.body, ph=c.userData.phase;
+  for(const c of (mode==='coffee'?coffeeChars:mode==='rozna'?roznaChars:majlisChars)){ const b=c.userData.body, ph=c.userData.phase;
     b.scale.y=1+Math.sin(t*1.8+ph)*0.008; if(b.userData.head){} const h=b.userData.head; if(h){ h.rotation.y=Math.sin(t*0.5+ph)*0.15; h.rotation.z=Math.sin(t*0.7+ph)*0.03; }
     if(c.userData.drone){ const d=c.userData.drone; d.position.y=2.6+Math.sin(t*2+ph)*0.15; d.position.x=Math.cos(t*0.8)*0.95; d.position.z=0.3+Math.sin(t*0.8)*0.5; d.rotation.y=t; } }
   if(mode!=='coffee') smoke.forEach((s,i)=>{ const k=((t*0.35+i/5)%1); s.position.y=0.5+k*1.6; s.position.x=2.6+Math.sin(k*6+i)*0.12; s.material.opacity=0.35*(1-k); s.scale.setScalar(1+k*1.5); });
