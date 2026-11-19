@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b1a10"/><stop offset="1" stop-color="#6B4226"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c0567a"/><stop offset=".55" stop-color="#f29a4a"/><stop offset="1" stop-color="#ffd27a"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f5d48a"/><stop offset="1" stop-color="#b8862f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- إطار القوس العُماني -->
+  <path d="M120 430 V230 A136 136 0 0 1 392 230 V430 Z" fill="#f6efe2"/>
+  <path d="M150 430 V236 A106 106 0 0 1 362 236 V430 Z" fill="url(#sky)"/>
+  <!-- الشمس والبحر -->
+  <circle cx="256" cy="330" r="46" fill="#ffe2a3" opacity=".9"/>
+  <rect x="150" y="340" width="212" height="90" fill="#3a4f7a"/>
+  <rect x="226" y="350" width="60" height="6" rx="3" fill="#ffd27a" opacity=".7"/>
+  <rect x="236" y="366" width="40" height="5" rx="2.5" fill="#ffd27a" opacity=".5"/>
+  <!-- الدلّة -->
+  <g fill="url(#brass)" stroke="#5a3820" stroke-width="5" stroke-linejoin="round">
+    <path d="M226 400 C222 360 236 330 246 318 L266 318 C276 330 290 360 286 400 Z"/>
+    <path d="M244 318 L250 282 L262 282 L268 318 Z"/>
+    <path d="M247 282 L256 254 L265 282 Z"/>
+    <path d="M284 360 C306 344 314 322 330 304 L336 310 C322 330 314 356 290 378 Z"/>
+    <path d="M228 340 C206 344 204 380 226 386" fill="none" stroke-width="9" stroke="#b8862f"/>
+  </g>
+  <rect x="200" y="400" width="112" height="14" rx="7" fill="#b8862f" stroke="#5a3820" stroke-width="4"/>
+  <!-- الأرضية والنقشة -->
+  <rect x="0" y="430" width="512" height="82" fill="#9e2b25"/>
+  <rect x="0" y="446" width="512" height="10" fill="#1d1714"/>
+  <rect x="0" y="462" width="512" height="6" fill="#f3ead8"/>
+  <rect x="0" y="474" width="512" height="10" fill="#d9a441"/>
+  <rect x="0" y="490" width="512" height="10" fill="#1d1714"/>
+</svg>
