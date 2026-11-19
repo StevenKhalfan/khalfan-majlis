@@ -117,6 +117,7 @@
   .tnote{width:100%;min-height:34px;border:1px dashed #e2d3b8;border-radius:10px;padding:4px 10px;font:13px 'IBM Plex Sans Arabic';background:#fffdf8}
   .res{width:100%;background:#fbf6ec;border-radius:10px;padding:6px 10px;font-size:13px;line-height:1.7} .res summary{font-weight:700;cursor:pointer;color:#2e7d4a}
   .msg.busy{opacity:.75;font-style:italic}
+  .queued{font-size:12px;font-weight:700;color:#8a5a12;background:#fde7c2;border-radius:10px;padding:4px 8px}
   .hint{position:fixed;z-index:4;bottom:calc(env(safe-area-inset-bottom) + 76px);left:50%;transform:translateX(-50%);
     background:rgba(27,19,13,.75);color:var(--sand);padding:8px 14px;border-radius:16px;font-size:13px;white-space:nowrap;transition:opacity .6s}
   #loading{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:#1b130d;color:var(--sand);font-size:18px;transition:opacity .6s}
@@ -136,7 +137,7 @@
 <div id="scene"></div>
 <div id="labels"></div>
 <div class="bar">
-  <div class="brand">مجلس خلفان <small>المرحلة ١ • v5</small></div>
+  <div class="brand">مجلس خلفان <small>المرحلة ١ • v5.1</small></div>
   <button class="btn on" id="bMajlis">المجلس</button>
   <button class="btn" id="bCoffee">قهوة المغرب</button>
   <button class="btn" id="bTop">منظر علوي</button>
@@ -680,6 +681,7 @@ async function cloudLoad(){
   RS.projects=p.data; RS.tasks=t.data||[];
   RS.log=(m.data||[]).reverse().map(x=>({from:x.sender,text:x.body,kind:x.kind}));
   RS.lastCheckin=me.data?.last_checkin||'';
+  RS.pending=(m.data||[]).filter(x=>x.kind==='order'&&x.handled===false).length;
   drawBoards();
 }
 async function say(sender,body,kind='chat'){ await sb.from('messages').insert({sender,body,kind}); }
@@ -707,7 +709,10 @@ async function distribute(raw,forced){
       await say('steven',`تمام ✓ عطيت ${first(forced)} ${lines.length===1?'المهمة':lines.length+' مهام'}:\n`+lines.map(l=>`• «${l}»`).join('\n'));
     } else {
       const r=await callSteven({action:'distribute',text:raw});
-      if(r.error){
+      if(r.error==='no_key'){
+        await sb.from('messages').insert({sender:'me',body:raw.trim(),kind:'order',handled:false});
+        await say('steven','استلمت ✓ بقرأ أوامرك وأوزّعها على الشباب في الجولة الجاية (كل ساعة)، وأرد عليك هنا.');
+      } else if(r.error){
         const lines=splitLines(raw), rows=lines.map(l=>({member:routeTask(l),text:l,project:projectOf(l)}));
         await sb.from('tasks').insert(rows);
         await say('me',raw.trim());
@@ -724,7 +729,7 @@ async function distribute(raw,forced){
 async function runSummary(){
   busy='ستيفن يجمع الملخص…'; renderRozna();
   const r=await callSteven({action:'summary'});
-  if(r.error) await say('steven',(ERR[r.error]||'')+'\n\n'+localSummary(),'summary');
+  if(r.error) await say('steven',(r.error==='no_key'?'':(ERR[r.error]||'')+'\n\n')+localSummary(),'summary');
   busy=''; await cloudLoad(); renderRozna();
 }
 async function execute(id){
@@ -732,7 +737,10 @@ async function execute(id){
   busy=`${first(t.member)} ${t.member==='jennifer'||t.member==='christina'?'تشتغل':'يشتغل'} على «${t.text.slice(0,40)}»…`; t.status='doing'; renderRozna();
   const note=(document.getElementById('note_'+id)||{}).value||'';
   const r=await callSteven({action:'execute',id,note});
-  if(r.error) await say('steven',r.error==='no_key'?'⚠️ التنفيذ يحتاج مفتاح Claude API. ركّبه في Supabase وجرّب مرة ثانية.':(ERR[r.error]||'⚠️ '+r.error));
+  if(r.error==='no_key'){
+    await sb.from('tasks').update({status:'doing',run_requested:true,note:note||null,updated_at:new Date().toISOString()}).eq('id',id);
+    await say('steven',`تمام ✓ ${first(t.member)} ${t.member==='jennifer'||t.member==='christina'?'بتشتغل':'بيشتغل'} على «${t.text}» في الجولة الجاية، والنتيجة توصلك هنا وفي «الفريق».`);
+  } else if(r.error) await say('steven',ERR[r.error]||'⚠️ '+r.error);
   busy=''; await cloudLoad(); renderRozna();
 }
 function memberLines(m){ const ts=RS.tasks.filter(t=>t.member===m); const pick=s=>ts.filter(t=>t.status===s).map(t=>t.text); return {done:pick('done'),doing:pick('doing'),next:pick('new')}; }
@@ -798,7 +806,8 @@ function renderRozna(){
   const tabs=[['orders','الأوامر'],['team','الفريق'],['projects','المشاريع']];
   let body='';
   if(rTab==='orders'){
-    body=`<div class="rlog" id="rlog">${RS.log.map((l,i)=>`<div class="msg ${l.from==='me'?'me':'steven'}">${l.from!=='me'?`<b>${who(l.from)}</b>`:''}<div>${esc(l.text).replace(/\n/g,'<br>')}</div>${l.kind&&l.kind!=='chat'?`<button class="mini" data-copy="${i}">نسخ</button>`:''}</div>`).join('')||'<p class="empty">اكتب أوامرك تحت، وستيفن يوزّعها على الفريق.</p>'}${busy?`<div class="msg steven busy"><b>⏳</b>${esc(busy)}</div>`:''}</div>
+    const pend=RS.pending||0;
+    body=(pend?`<p class="note">📨 ${pend} ${pend===1?'أمر ينتظر':'أوامر تنتظر'} الجولة الجاية.</p>`:'')+`<div class="rlog" id="rlog">${RS.log.map((l,i)=>`<div class="msg ${l.from==='me'?'me':'steven'}">${l.from!=='me'?`<b>${who(l.from)}</b>`:''}<div>${esc(l.text).replace(/\n/g,'<br>')}</div>${l.kind&&l.kind!=='chat'?`<button class="mini" data-copy="${i}">نسخ</button>`:''}</div>`).join('')||'<p class="empty">اكتب أوامرك تحت، وستيفن يوزّعها على الفريق.</p>'}${busy?`<div class="msg steven busy"><b>⏳</b>${esc(busy)}</div>`:''}</div>
     <div class="rcomp">
       <div class="who">${[['auto','⭐ ستيفن يوزّع'],...MEMBERS.map(m=>[m,BY[m].emoji+' '+first(m)])].map(([k,l])=>`<button class="pick ${rForced===k?'on':''}" data-pick="${k}">${l}</button>`).join('')}</div>
       <textarea id="rtext" rows="3" placeholder="اكتب الأوامر… ستيفن يفهمها ويوزّعها"></textarea>
@@ -809,9 +818,9 @@ function renderRozna(){
       const t=m?BY[m]:{name:'بدون مسؤول',role:'حدّد لمين',color:'#999',emoji:'❔'};
       return `<div class="mcard" style="--c:${t.color}"><div class="mh"><b>${t.emoji} ${t.name}</b><span>${t.role}</span></div>
         ${ts.length?ts.slice().reverse().map(x=>`<div class="task ${x.status}"><button class="st" data-st="${x.id}">${ST_LABEL[x.status]}</button><span class="tx">${esc(x.text)}${x.project?` <i>${esc(pName(x.project))}</i>`:''}</span>
-          ${m&&x.status!=='done'?`<button class="run" data-run="${x.id}" ${busy?'disabled':''}>▶ نفّذ</button>`:''}
+          ${m&&x.status!=='done'?(x.run_requested?'<span class="queued">⏳ بالدور</span>':`<button class="run" data-run="${x.id}" ${busy?'disabled':''}>▶ نفّذ</button>`):''}
           ${m===null?`<span class="as">${MEMBERS.map(mm=>`<button data-as="${x.id}:${mm}">${first(mm)}</button>`).join('')}</span>`:''}<button class="del" data-del="${x.id}" aria-label="حذف">×</button>
-          ${m&&x.status!=='done'?`<input class="tnote" id="note_${x.id}" placeholder="ملاحظة للتنفيذ (اختياري)">`:''}
+          ${m&&x.status!=='done'&&!x.run_requested?`<input class="tnote" id="note_${x.id}" placeholder="ملاحظة للتنفيذ (اختياري)">`:''}
           ${x.result?`<details class="res"><summary>النتيجة</summary><div>${esc(x.result).replace(/\n/g,'<br>')}</div><button class="mini" data-cres="${x.id}">نسخ</button></details>`:''}</div>`).join(''):'<p class="empty">ما عنده مهام حاليًا.</p>'}</div>`; }).join('');
   } else {
     body=`<p class="note">اضغط على الدائرة عشان تغيّر حالة المشروع.</p>`+RS.projects.map(p=>{ const open=RS.tasks.filter(t=>t.project===p.id&&t.status!=='done').length;
