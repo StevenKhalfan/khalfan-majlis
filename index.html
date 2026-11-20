@@ -125,6 +125,10 @@
   .dcard{background:#fff;border:1px solid #eadcc2;border-radius:14px;padding:8px 12px;margin-bottom:10px}
   .dcard summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center}
   .dec{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px dashed #efe3cc;font-size:14px} .dec span{flex:1} .dec.done span{opacity:.5;text-decoration:line-through}
+  .pcard{background:#fff;border:1px solid #eadcc2;border-radius:14px;padding:8px 12px;margin-bottom:10px}
+  .pcard summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center}
+  .proj{display:flex;gap:8px;align-items:center;padding:7px 0;border-top:1px dashed #efe3cc;font-size:14px} .proj .pn{flex:1} .proj .pd{width:10px;height:10px;border-radius:50%;flex:none}
+  .proj a{color:#1F4E79;font-weight:600;white-space:nowrap} .proj .na{font-size:12px;color:#a08a6c;white-space:nowrap}
   .acard{background:#fff7e6;border:2px solid #E3A23B;border-radius:14px;padding:8px 12px;margin-bottom:10px}
   .acard summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center;gap:6px}
   .acard .cnt{background:#d9534f;color:#fff;border-radius:999px;padding:0 8px;font-size:12px}
@@ -723,6 +727,12 @@ function bindAsks(){
       noteOpen=null; await refresh({action:'ask',id,verdict:v,note}); }); });
   const sa=rp.querySelector('#rshowans'); if(sa) sa.onclick=()=>{ showAnswered=!showAnswered; renderRozna(); };
 }
+function projectsHTML(){
+  const ps=RS.projects||[]; if(!ps.length) return '';
+  return `<details class="pcard"><summary>📁 المشاريع وروابطها (${ps.length})</summary>
+    ${ps.map(p=>`<div class="proj"><span class="pd" style="background:${P_COL[p.status]||'#999'}"></span><span class="pn">${esc(p.name)}</span>${safeUrl(p.link)?`<a href="${esc(p.link)}" target="_blank" rel="noopener">🔗 افتح</a>`:'<span class="na">غير متوفر</span>'}</div>`).join('')}
+  </details>`;
+}
 function renderRozna(){
   if(!getPin()||rErr==='bad_pin'||rErr==='need_pin'){
     rp.innerHTML=headHTML()+`<div class="rbody"><div class="login"><h3>🔒 الرقم السري</h3><p>اكتب رقم الروزنة. مرة وحدة بس لكل جهاز.</p>
@@ -739,6 +749,7 @@ function renderRozna(){
     ${ERRS[rErr]?`<p class="bad">${ERRS[rErr]}</p>`:''}
     <div class="ucard"><b>📋 آخر أبديت من ستيفن</b>${upd?`<span>${fmtT(upd.created_at)}</span><div class="ubody">${esc(upd.body).replace(/\n/g,'<br>')}</div>`:'<div class="ubody muted">أول أبديت يوصلك في جولة الصبح.</div>'}</div>
     ${asksHTML()}
+    ${projectsHTML()}
     <details class="dcard" ${active.length?'open':''}><summary>✅ القرارات (${active.length})</summary>
       ${active.map(d=>`<div class="dec"><span>${esc(d.body)}</span><button class="mini" data-dd="${d.id}" title="تم">✓</button></div>`).join('')||'<p class="empty">ما فيه قرارات مفتوحة.</p>'}
       ${done.length?`<button class="linkb" id="rshowdone">${showDone?'إخفاء':'عرض'} المنفّذة (${done.length})</button>${showDone?done.map(d=>`<div class="dec done"><span>${esc(d.body)}</span></div>`).join(''):''}`:''}
