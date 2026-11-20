@@ -41,13 +41,27 @@ Deno.serve(async (req) => {
       await sb.from("decisions").update({ status: st }).eq("id", body.id).eq("user_id", owner);
     }
 
-    const [msgs, decs, pend, upd, projs, tks] = await Promise.all([
+    if (body.action === "ask" && body.id) {
+      const verdict = ["approved", "rejected", "noted"].includes(body.verdict) ? body.verdict : "approved";
+      const note = String(body.note ?? "").trim().slice(0, 2000);
+      if (verdict === "noted" && !note) return json({ error: "empty" }, 400);
+      const { data: a } = await sb.from("asks").update({ status: verdict, answer: note || null, answered_at: new Date().toISOString() })
+        .eq("id", body.id).eq("user_id", owner).eq("status", "pending").select("body").single();
+      if (a) {
+        const tag = verdict === "approved" ? "✅ موافق على" : verdict === "rejected" ? "❌ مرفوض" : "📝 ملاحظة على";
+        await sb.from("messages").insert({ user_id: owner, sender: "me", kind: "order", handled: false,
+          body: `${tag}: ${a.body}${note ? `\n${note}` : ""}` });
+      }
+    }
+
+    const [msgs, decs, pend, upd, projs, tks, asks] = await Promise.all([
       sb.from("messages").select("id,sender,body,kind,created_at").eq("user_id", owner).in("sender", ["me", "steven"]).order("created_at", { ascending: false }).limit(60),
       sb.from("decisions").select("id,body,status,created_at").eq("user_id", owner).order("created_at", { ascending: false }).limit(40),
       sb.from("messages").select("id", { count: "exact", head: true }).eq("user_id", owner).eq("kind", "order").eq("handled", false),
       sb.from("messages").select("body,created_at").eq("user_id", owner).eq("kind", "update").order("created_at", { ascending: false }).limit(1),
       sb.from("projects").select("id,name,status").eq("user_id", owner).order("sort"),
       sb.from("tasks").select("member,text,status,project").eq("user_id", owner).order("created_at", { ascending: false }).limit(80),
+      sb.from("asks").select("id,body,project,member,link,status,answer,created_at,answered_at").eq("user_id", owner).order("created_at", { ascending: false }).limit(60),
     ]);
     return json({
       messages: (msgs.data ?? []).reverse(),
@@ -56,6 +70,7 @@ Deno.serve(async (req) => {
       update: upd.data?.[0] ?? null,
       projects: projs.data ?? [],
       tasks: tks.data ?? [],
+      asks: asks.data ?? [],
     });
   } catch (e) {
     return json({ error: String((e as Error).message).slice(0, 200) }, 500);

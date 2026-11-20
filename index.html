@@ -125,6 +125,18 @@
   .dcard{background:#fff;border:1px solid #eadcc2;border-radius:14px;padding:8px 12px;margin-bottom:10px}
   .dcard summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center}
   .dec{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px dashed #efe3cc;font-size:14px} .dec span{flex:1} .dec.done span{opacity:.5;text-decoration:line-through}
+  .acard{background:#fff7e6;border:2px solid #E3A23B;border-radius:14px;padding:8px 12px;margin-bottom:10px}
+  .acard summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center;gap:6px}
+  .acard .cnt{background:#d9534f;color:#fff;border-radius:999px;padding:0 8px;font-size:12px}
+  .ask{padding:9px 0;border-top:1px dashed #efd9ae;font-size:14px}
+  .ask .meta{font-size:11px;color:#8a7356;margin-top:2px}
+  .ask a{color:#1F4E79;font-weight:600;word-break:break-all}
+  .ask .btns{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+  .ask .btns button{flex:1;min-height:36px;border-radius:10px;border:1px solid #e2d3b8;background:#fff;font:600 13px 'IBM Plex Sans Arabic';cursor:pointer}
+  .ask .ok{background:#3cb371!important;color:#fff;border-color:#3cb371!important}
+  .ask .no{color:#b03a2e}
+  .ask textarea{width:100%;margin-top:6px;border:1px solid #e2d3b8;border-radius:10px;padding:8px;font:14px 'IBM Plex Sans Arabic';box-sizing:border-box}
+  .ask.answered{opacity:.6} .ask.answered .st{font-weight:700}
   .linkb{border:none;background:none;color:#8a5a12;font:600 12px 'IBM Plex Sans Arabic';padding:6px 0;cursor:pointer}
   .msg small{display:block;font-size:10px;opacity:.5;margin-top:4px}
   .bad{color:#b3261e;font-weight:600;font-size:13px}
@@ -147,7 +159,7 @@
 <div id="scene"></div>
 <div id="labels"></div>
 <div class="bar">
-  <div class="brand">مجلس خلفان <small>المرحلة ١ • v6.1</small></div>
+  <div class="brand">مجلس خلفان <small>المرحلة ١ • v6.2</small></div>
   <button class="btn on" id="bMajlis">المجلس</button>
   <button class="btn" id="bCoffee">قهوة المغرب</button>
   <button class="btn" id="bTop">منظر علوي</button>
@@ -632,7 +644,10 @@ const roznaChars=[roznaSteven];
 const FN_URL='https://upmvonycmyqnuaswjojs.supabase.co/functions/v1/rozna';
 const MEMBERS=['michael','jennifer','christina','matthew'];
 const P_COL={green:'#3cb371',yellow:'#e0b13b',red:'#d9534f',blue:'#7aa6d6'}, P_LBL={green:'على المسار',yellow:'يحتاج دفعة',red:'متعثر',blue:'فكرة'};
-let RS={projects:[],tasks:[],messages:[],decisions:[],pending:0,update:null}, rState='idle', rErr='', showDone=false, timer=null;
+let RS={projects:[],tasks:[],messages:[],decisions:[],asks:[],pending:0,update:null}, rState='idle', rErr='', showDone=false, showAnswered=false, noteOpen=null, timer=null;
+const MEM_NAME={michael:'مايكل',jennifer:'جنيفر',christina:'كرستينا',matthew:'ماثيو'};
+const ASK_ST={approved:'✅ وافقت',rejected:'❌ رفضت',noted:'📝 ملاحظتك'};
+const safeUrl=u=>/^https:\/\//.test(u||'')?u:'';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const getPin=()=>{ try{ return localStorage.getItem('rozna_pin')||''; }catch{ return ''; } };
 const setPin=v=>{ try{ v?localStorage.setItem('rozna_pin',v):localStorage.removeItem('rozna_pin'); }catch{} };
@@ -686,6 +701,28 @@ const ERRS={net:'ما قدرت أوصل للروزنة. تأكد من الإنت
 function headHTML(){ return `<div class="rhead"><div class="avatar" style="--c:#E3A23B">س</div><div><h2>روزنة المدير العام</h2><p>أنت وستيفن بس — هو يوزّع على الفريق</p></div>${getPin()?'<button class="mini" id="rlock" title="قفل">🔒</button>':''}<button class="close" id="rclose" aria-label="تصغير">−</button></div>`; }
 function bindHead(){ const c=rp.querySelector('#rclose'); if(c) c.onclick=()=>{ rp.classList.remove('open'); rOpen.classList.add('show'); stopPoll(); };
   const l=rp.querySelector('#rlock'); if(l) l.onclick=()=>{ setPin(''); RS.messages=[]; renderRozna(); }; }
+function asksHTML(){
+  const all=RS.asks||[], pend=all.filter(a=>a.status==='pending').sort((a,b)=>a.id-b.id), ans=all.filter(a=>a.status!=='pending');
+  const pname=id=>(RS.projects.find(p=>p.id===id)||{}).name||'';
+  const meta=a=>[pname(a.project),MEM_NAME[a.member]].filter(Boolean).join(' • ');
+  const link=a=>safeUrl(a.link)?`<div><a href="${esc(a.link)}" target="_blank" rel="noopener">🔗 افتح</a></div>`:'';
+  return `<details class="acard" open><summary>❓ ينتظر قرارك ${pend.length?`<span class="cnt">${pend.length}</span>`:''}</summary>
+    ${pend.map(a=>`<div class="ask" data-ask="${a.id}"><div>${esc(a.body)}</div><div class="meta">${esc(meta(a))}</div>${link(a)}
+      <div class="btns"><button class="ok" data-v="approved">✓ موافق</button><button class="no" data-v="rejected">✗ رفض</button><button data-v="note">📝 ملاحظة</button></div>
+      ${noteOpen===a.id?`<textarea rows="2" placeholder="اكتب ملاحظتك أو المعلومة المطلوبة…"></textarea><div class="btns"><button class="ok" data-v="noted">أرسل الملاحظة</button></div>`:''}</div>`).join('')||'<p class="empty">ما فيه شي ينتظرك الحين 👌</p>'}
+    ${ans.length?`<button class="linkb" id="rshowans">${showAnswered?'إخفاء':'عرض'} اللي رديت عليه (${ans.length})</button>${showAnswered?ans.map(a=>`<div class="ask answered"><div>${esc(a.body)}</div><div class="meta"><span class="st">${ASK_ST[a.status]||''}</span>${a.answer?' — '+esc(a.answer):''}</div></div>`).join(''):''}`:''}
+  </details>`;
+}
+function bindAsks(){
+  rp.querySelectorAll('[data-ask]').forEach(card=>{ const id=+card.dataset.ask;
+    card.querySelectorAll('button[data-v]').forEach(b=>b.onclick=async()=>{ const v=b.dataset.v;
+      if(v==='note'){ noteOpen=noteOpen===id?null:id; renderRozna(); const t=rp.querySelector(`[data-ask="${id}"] textarea`); if(t) t.focus(); return; }
+      const note=(card.querySelector('textarea')?.value||'').trim();
+      if(v==='noted'&&!note){ card.querySelector('textarea').focus(); return; }
+      card.querySelectorAll('button').forEach(x=>x.disabled=true); b.textContent='…';
+      noteOpen=null; await refresh({action:'ask',id,verdict:v,note}); }); });
+  const sa=rp.querySelector('#rshowans'); if(sa) sa.onclick=()=>{ showAnswered=!showAnswered; renderRozna(); };
+}
 function renderRozna(){
   if(!getPin()||rErr==='bad_pin'||rErr==='need_pin'){
     rp.innerHTML=headHTML()+`<div class="rbody"><div class="login"><h3>🔒 الرقم السري</h3><p>اكتب رقم الروزنة. مرة وحدة بس لكل جهاز.</p>
@@ -701,6 +738,7 @@ function renderRozna(){
   rp.innerHTML=headHTML()+`<div class="rbody">
     ${ERRS[rErr]?`<p class="bad">${ERRS[rErr]}</p>`:''}
     <div class="ucard"><b>📋 آخر أبديت من ستيفن</b>${upd?`<span>${fmtT(upd.created_at)}</span><div class="ubody">${esc(upd.body).replace(/\n/g,'<br>')}</div>`:'<div class="ubody muted">أول أبديت يوصلك في جولة الصبح.</div>'}</div>
+    ${asksHTML()}
     <details class="dcard" ${active.length?'open':''}><summary>✅ القرارات (${active.length})</summary>
       ${active.map(d=>`<div class="dec"><span>${esc(d.body)}</span><button class="mini" data-dd="${d.id}" title="تم">✓</button></div>`).join('')||'<p class="empty">ما فيه قرارات مفتوحة.</p>'}
       ${done.length?`<button class="linkb" id="rshowdone">${showDone?'إخفاء':'عرض'} المنفّذة (${done.length})</button>${showDone?done.map(d=>`<div class="dec done"><span>${esc(d.body)}</span></div>`).join(''):''}`:''}
@@ -714,9 +752,10 @@ function renderRozna(){
   rp.querySelector('#rsend').onclick=async()=>{ const ta=rp.querySelector('#rtext'); const v=ta.value.trim(); if(!v){ ta.focus(); return; } rState='sending'; renderRozna(); await refresh({action:'send',text:v}); rState='idle'; renderRozna(); };
   rp.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>refresh({action:'decision',id:+b.dataset.dd,status:'done'}));
   const sd=rp.querySelector('#rshowdone'); if(sd) sd.onclick=()=>{ showDone=!showDone; renderRozna(); };
-  const bd=rp.querySelector('.rbody'); if(bd) bd.scrollTop=bd.scrollHeight;
+  bindAsks();
+  const bd=rp.querySelector('.rbody'); if(bd && !noteOpen && !(RS.asks||[]).some(a=>a.status==='pending')) bd.scrollTop=bd.scrollHeight;
 }
-function startPoll(){ stopPoll(); timer=setInterval(()=>{ if(!document.hidden&&rp.classList.contains('open')&&rState==='idle'&&!document.activeElement?.matches?.('#rtext')) refresh(); },60000); }
+function startPoll(){ stopPoll(); timer=setInterval(()=>{ if(!document.hidden&&rp.classList.contains('open')&&rState==='idle'&&noteOpen===null&&!document.activeElement?.matches?.('#rtext')) refresh(); },60000); }
 function stopPoll(){ if(timer) clearInterval(timer); timer=null; }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&rp.classList.contains('open')&&getPin()) refresh(); });
 function openRozna(){ renderRozna(); rp.classList.add('open'); rOpen.classList.remove('show'); if(getPin()){ refresh(); startPoll(); } }
