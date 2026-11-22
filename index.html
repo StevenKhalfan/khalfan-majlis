@@ -129,6 +129,7 @@
   .pcard summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center}
   .proj{display:flex;gap:8px;align-items:center;padding:7px 0;border-top:1px dashed #efe3cc;font-size:14px} .proj .pn{flex:1} .proj .pd{width:10px;height:10px;border-radius:50%;flex:none}
   .proj a{color:#1F4E79;font-weight:600;white-space:nowrap} .proj .na{font-size:12px;color:#a08a6c;white-space:nowrap}
+  .proj .pdesc{display:block;font-size:12px;color:#7a6a52;line-height:1.6;margin-top:2px}
   .acard{background:#fff7e6;border:2px solid #E3A23B;border-radius:14px;padding:8px 12px;margin-bottom:10px}
   .acard summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center;gap:6px}
   .acard .cnt{background:#d9534f;color:#fff;border-radius:999px;padding:0 8px;font-size:12px}
@@ -730,7 +731,7 @@ function bindAsks(){
 function projectsHTML(){
   const ps=RS.projects||[]; if(!ps.length) return '';
   return `<details class="pcard"><summary>📁 المشاريع وروابطها (${ps.length})</summary>
-    ${ps.map(p=>`<div class="proj"><span class="pd" style="background:${P_COL[p.status]||'#999'}"></span><span class="pn">${esc(p.name)}</span>${safeUrl(p.link)?`<a href="${esc(p.link)}" target="_blank" rel="noopener">🔗 افتح</a>`:'<span class="na">غير متوفر</span>'}</div>`).join('')}
+    ${ps.map(p=>`<div class="proj"><span class="pd" style="background:${P_COL[p.status]||'#999'}"></span><span class="pn">${esc(p.name)}${p.description?`<small class="pdesc">${esc(p.description)}</small>`:''}</span>${safeUrl(p.link)?`<a href="${esc(p.link)}" target="_blank" rel="noopener">🔗 افتح</a>`:'<span class="na">غير متوفر</span>'}</div>`).join('')}
   </details>`;
 }
 function renderRozna(){

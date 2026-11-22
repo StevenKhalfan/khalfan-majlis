@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
       sb.from("decisions").select("id,body,status,created_at").eq("user_id", owner).order("created_at", { ascending: false }).limit(40),
       sb.from("messages").select("id", { count: "exact", head: true }).eq("user_id", owner).eq("kind", "order").eq("handled", false),
       sb.from("messages").select("body,created_at").eq("user_id", owner).eq("kind", "update").order("created_at", { ascending: false }).limit(1),
-      sb.from("projects").select("id,name,status,link").eq("user_id", owner).order("sort"),
+      sb.from("projects").select("id,name,status,link,description").eq("user_id", owner).order("sort"),
       sb.from("tasks").select("member,text,status,project").eq("user_id", owner).order("created_at", { ascending: false }).limit(80),
       sb.from("asks").select("id,body,project,member,link,status,answer,created_at,answered_at").eq("user_id", owner).order("created_at", { ascending: false }).limit(60),
     ]);
